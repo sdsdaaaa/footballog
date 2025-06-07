@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>경기 상세 정보</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f9f9f9; }
+    h1, h2 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; background: #fff; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+    th { background-color: #dce6f7; }
+    .team-section { margin-bottom: 40px; }
+
+    table tr:nth-child(even) { background: #f2f2f2; }
+    table th { background: #1565c0; color: white; }
+
+  </style>
+</head>
+<body>
+  <h1 id="match-title">경기 상세</h1>
+  <p id="match-info" style="text-align:center;"></p>
+
+  <div class="team-section">
+    <h2>팀 통계</h2>
+    <table id="team-stats"></table>
+  </div>
+
+  <div class="team-section">
+    <h2>선수 통계</h2>
+    <div id="player-stats"></div>
+  </div>
+
+  <script>
+    const apiKey = "dba62925619cc528de8b6acc72548d85";
+    const fixtureId = new URLSearchParams(location.search).get("fixtureId");
+
+    if (!fixtureId) {
+      document.body.innerHTML = "<p>fixtureId가 없습니다.</p>";
+      throw new Error("Missing fixtureId");
+    }
+
+    fetch(`https://v3.football.api-sports.io/fixtures?id=${fixtureId}`, {
+      headers: { "x-apisports-key": apiKey }
+    })
+    .then(res => res.json())
+    .then(data => {
+      const f = data.response[0];
+      document.getElementById("match-title").textContent = `${f.teams.home.name} ${f.goals.home} : ${f.goals.away} ${f.teams.away.name}`;
+      document.getElementById("match-info").textContent = `${f.league.name} | ${new Date(f.fixture.date).toLocaleDateString("ko-KR", { year: 'numeric', month: '2-digit', day: '2-digit' })
+}`;
+    });
+
+    fetch(`https://v3.football.api-sports.io/fixtures/statistics?fixture=${fixtureId}`, {
+      headers: { "x-apisports-key": apiKey }
+    })
+    .then(res => res.json())
+    .then(data => {
+      const home = data.response[0];
+      const away = data.response[1];
+      const table = document.getElementById("team-stats");
+      table.innerHTML = `<tr><th>항목</th><th>${home.team.name}</th><th>${away.team.name}</th></tr>`;
+      home.statistics.forEach((s, i) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${s.type}</td><td>${s.value ?? "-"}</td><td>${away.statistics[i]?.value ?? "-"}</td>`;
+        table.appendChild(row);
+      });
+    });
+
+    fetch(`https://v3.football.api-sports.io/fixtures/players?fixture=${fixtureId}`, {
+      headers: { "x-apisports-key": apiKey }
+    })
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("player-stats");
+      data.response.forEach(team => {
+        const table = document.createElement("table");
+        table.innerHTML = `<tr><th colspan=\"7\">${team.team.name}</th></tr><tr><th>선수</th><th>포지션</th><th>시간</th><th>골</th><th>어시</th><th>패스</th><th>평점</th></tr>`;
+        team.players.forEach(p => {
+          const s = p.statistics?.[0] || {};
+          table.innerHTML += `<tr>
+            <td>${p.player.name}</td>
+            <td>${p.player.position ?? '-'}</td>
+            <td>${s.games.minutes ?? '-'}</td>
+            <td>${s.goals.total ?? 0}</td>
+            <td>${s.goals.assists ?? 0}</td>
+            <td>${s.passes.total ?? 0}</td>
+            <td>${s.rating ?? '-'}</td>
+          </tr>`;
+        });
+        container.appendChild(table);
+      });
+    });
+  </script>
+</body>
+</html>

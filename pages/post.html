@@ -1,0 +1,321 @@
+  <!DOCTYPE html>
+  <html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <title>게시글 보기</title>
+    <style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to bottom, #e3f2fd, #ffffff);
+    margin: 0;
+    padding: 40px;
+    color: #222;
+  }
+
+  #post-box {
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 40px;
+  }
+
+  h1 {
+    font-size: 28px;
+    color: #0d47a1;
+    margin-bottom: 16px;
+  }
+
+  .meta {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  .meta span {
+    margin-left: 6px;
+    font-weight: bold;
+    color: #222;
+  }
+
+  #post-content {
+    font-size: 16px;
+    white-space: pre-wrap;
+    margin-bottom: 30px;
+    line-height: 1.7;
+  }
+
+  #comment-section {
+    background: #fff;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+
+  #comment-section h3 {
+    margin-bottom: 16px;
+    color: #1565c0;
+  }
+
+  #comment-list {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 20px;
+  }
+
+  #comment-list li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f1f8ff;
+    border-radius: 8px;
+  }
+
+  input {
+    width: 80%;
+    padding: 10px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  button {
+    padding: 10px 16px;
+    background: #1565c0;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+
+  button:hover {
+    background: #0d47a1;
+  }
+
+  #post-footer {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 16px;
+  color: #444;
+}
+
+#like-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #999;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+#like-btn.liked {
+  color: #f44336;
+}
+
+</style>
+
+  </head>
+  <body>
+
+    <div id="post-footer">
+      <div style="text-align: center; margin-top: 30px;">
+  <button onclick="goBack()">📋 목록으로</button>
+</div>
+
+  <button class="like-btn" id="like-btn">🤍</button>
+  <span id="like-count">0</span> · 💬 <span id="comment-count-bottom">0</span>
+</div>
+
+
+
+    <div id="post-box">
+  <h1 id="post-title"></h1>
+  <div class="meta">
+    👤 작성자: <span id="post-author"></span><br>
+    📅 날짜: <span id="post-date"></span><br>
+    👁️ 조회수: <span id="post-views"></span><br>
+    💬 댓글 수: <span id="post-comments-count"></span>
+  </div>
+  <div id="post-content"></div>
+</div>
+
+<div id="comment-section">
+  <h3>💬 댓글</h3>
+  <ul id="comment-list"></ul>
+
+  <div style="margin-top: 10px;">
+    <input id="comment-input" placeholder="댓글 입력">
+    <button id="comment-btn">댓글 달기</button>
+  </div>
+</div>
+
+    <script type="module">
+     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA02saQDvqMQbDLrD5UMwX848E6eFO-rUU",
+  authDomain: "northern-cooler-461505-d5.firebaseapp.com",
+  projectId: "northern-cooler-461505-d5",
+  storageBucket: "northern-cooler-461505-d5.appspot.com",
+  messagingSenderId: "57199546606",
+  appId: "1:57199546606:web:b4e134094c86623e25a3ff"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser;
+let posts = [];
+let post;
+const id = new URLSearchParams(location.search).get("id");
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    alert("로그인 후 이용 가능합니다.");
+    location.href = "login.html";
+    return;
+  }
+
+  const userDoc = await getDoc(doc(db, "users", user.uid));
+  const nickname = userDoc.exists() ? userDoc.data().nickname : user.email;
+
+  currentUser = {
+    uid: user.uid,
+    email: user.email,
+    nickname: nickname
+  };
+
+  init();
+});
+
+function init() {
+  posts = JSON.parse(localStorage.getItem("posts") || "[]");
+  post = posts.find(p => String(p.id) === id);
+
+  if (!post) {
+    document.body.innerHTML = '<h2>게시글을 찾을 수 없습니다.</h2>';
+    return;
+  }
+
+  post.comments = post.comments || []; // 댓글 배열 보장
+  post.views = (post.views || 0) + 1;
+  localStorage.setItem("posts", JSON.stringify(posts));
+
+  document.getElementById("post-title").innerText = post.title;
+  document.getElementById("post-author").innerText = post.author;
+  document.getElementById("post-date").innerText = post.date;
+  document.getElementById("post-views").innerText = post.views;
+  document.getElementById("post-comments-count").innerText = post.comments.length;
+  document.getElementById("comment-count-bottom").innerText = post.comments.length;
+  document.getElementById("post-content").innerText = post.content;
+
+  // 좋아요 처리
+  let likedPosts = JSON.parse(localStorage.getItem("likedPosts") || "[]");
+  let liked = likedPosts.includes(post.id);
+  const likeBtn = document.getElementById("like-btn");
+  const likeCount = document.getElementById("like-count");
+
+  likeBtn.classList.toggle("liked", liked);
+  likeBtn.innerText = liked ? "❤️" : "🤍";
+  likeCount.innerText = post.likes || 0;
+
+  likeBtn.addEventListener("click", () => {
+    const postIndex = posts.findIndex(p => String(p.id) === String(post.id));
+    if (postIndex === -1) return;
+
+    if (liked) {
+      posts[postIndex].likes = Math.max((posts[postIndex].likes || 1) - 1, 0);
+      likedPosts = likedPosts.filter(pid => pid !== post.id);
+    } else {
+      posts[postIndex].likes = (posts[postIndex].likes || 0) + 1;
+      likedPosts.push(post.id);
+    }
+
+    liked = !liked;
+    localStorage.setItem("posts", JSON.stringify(posts));
+    localStorage.setItem("likedPosts", JSON.stringify(likedPosts));
+
+    likeBtn.classList.toggle("liked", liked);
+    likeBtn.innerText = liked ? "❤️" : "🤍";
+    likeCount.innerText = posts[postIndex].likes;
+  });
+
+  renderComments();
+}
+
+// 댓글 렌더링
+function renderComments() {
+  const list = document.getElementById("comment-list");
+
+  // 닉네임이 아닌 이메일이 저장된 댓글을 nickname으로 덮어쓰기 (동기화)
+  post.comments = post.comments.map(c => {
+    // 만약 uid가 같고 author가 이메일이면 → 닉네임으로 변경
+    if (c.uid === currentUser.uid && c.author === currentUser.email) {
+      return { ...c, author: currentUser.nickname };
+    }
+    return c;
+  });
+
+  list.innerHTML = post.comments.map((c, i) => {
+    const isOwner = c.uid === currentUser.uid;
+    return `
+      <li>
+        <div><strong>${c.author}</strong> · <small>${c.date || "날짜 없음"}</small></div>
+        <div>${c.text}</div>
+        ${isOwner ? `<button onclick="deleteComment(${i})">삭제</button>` : ""}
+      </li>
+    `;
+  }).join("");
+
+  // UI 수치 반영
+  document.getElementById("post-comments-count").innerText = post.comments.length;
+  document.getElementById("comment-count-bottom").innerText = post.comments.length;
+
+  // 동기화된 댓글 반영
+  localStorage.setItem("posts", JSON.stringify(posts));
+}
+
+window.goBack = function () {
+  const type = new URLSearchParams(location.search).get("type") || "free";
+  location.href = `board.html?type=${type}`;
+};
+
+
+
+
+window.deleteComment = function(index) {
+  if (!confirm("댓글을 삭제하시겠습니까?")) return;
+  post.comments.splice(index, 1);
+  localStorage.setItem("posts", JSON.stringify(posts));
+  renderComments();
+};
+
+// 댓글 달기
+document.getElementById("comment-btn").addEventListener("click", () => {
+  const input = document.getElementById("comment-input");
+  const text = input.value.trim();
+  if (!text) return;
+
+  const now = new Date();
+  const dateStr = now.toLocaleString("ko-KR");
+
+  post.comments.push({
+    author: currentUser.nickname,
+    uid: currentUser.uid,
+    text,
+    date: dateStr
+  });
+
+  localStorage.setItem("posts", JSON.stringify(posts));
+  input.value = "";
+  renderComments();
+});
+
+    </script>
+  </body>
+  </html>

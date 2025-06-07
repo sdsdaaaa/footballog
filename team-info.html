@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Footballog - 팀 정보</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="js/script.js" defer></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+import {
+  getFirestore,         // Firestore 초기화
+  collection,           // 컬렉션 참조
+  doc,                  // 특정 문서 참조
+  getDoc,               // 문서 1개 읽기
+  getDocs,              // 쿼리 결과 여러 문서 읽기
+  setDoc,               // 문서 전체 덮어쓰기
+  addDoc,               // 문서 자동 ID로 추가
+  updateDoc,            // 문서 필드 일부 수정
+  deleteDoc,            // 문서 삭제
+  query,                // 조건 쿼리 구성
+  where,                // 필터 조건
+  orderBy,              // 정렬 조건
+  limit,                // 제한
+  startAfter,           // 페이지네이션
+  onSnapshot            // 실시간 변경 감지 (listener)
+} from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA02saQDvqMQbDLrD5UMwX848E6eFO-rUU",
+      authDomain: "northern-cooler-461505-d5.firebaseapp.com",
+      projectId: "northern-cooler-461505-d5",
+      storageBucket: "northern-cooler-461505-d5.appspot.com",
+      messagingSenderId: "57199546606",
+      appId: "1:57199546606:web:b4e134094c86623e25a3ff",
+      measurementId: "G-562VJ9VE2P"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.addEventListener("DOMContentLoaded", () => {
+  const loginBtn = document.querySelector(".login-btn");
+  const mypageBtn = document.getElementById("mypageBtn");
+  const alarmBtn = document.getElementById("alarmBtn");
+  const alarmList = document.getElementById("alarmList");
+  const alarmDot = document.getElementById("alarmDot");
+
+
+  if (alarmBtn) {
+  alarmBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const isVisible = alarmList.style.display === "block";
+
+  if (!isVisible && alarmList.innerHTML.trim() === "") {
+    alarmList.innerHTML = `<div style='padding:10px; color:#999; text-align:center;'>새로운 메시지가 없습니다.</div>`;
+  }
+
+  // ✅ 알림창을 열 때 빨간 점 숨기기
+  if (!isVisible) {
+    alarmDot.style.display = "none";
+  }
+
+  alarmList.style.display = isVisible ? "none" : "block";
+});
+
+}
+
+document.addEventListener("click", (e) => {
+  if (!alarmBtn.contains(e.target) && !alarmList.contains(e.target)) {
+    alarmList.style.display = "none";
+  }
+});
+
+
+  onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    loginBtn.textContent = "로그아웃";
+    loginBtn.href = "#";
+    loginBtn.onclick = () => {
+      signOut(auth).then(() => {
+        alert("로그아웃되었습니다.");
+        location.reload();
+      });
+    };
+    if (mypageBtn) mypageBtn.style.display = "inline-block";
+
+    const db = getFirestore();
+    const userDocRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userDocRef);
+    if (!userSnap.exists()) return;
+
+    const currentUserNickname = userSnap.data().nickname;
+
+    const welcomeBox = document.getElementById("welcome-message");
+    if (welcomeBox) {
+      welcomeBox.textContent = `환영합니다, ${currentUserNickname}님`;
+      welcomeBox.style.display = "block";
+    }
+
+    // ✅ 알림 감지 (messages 콜렉션, 닉네임 기준)
+    const messagesRef = collection(db, "messages");
+    const q = query(
+      messagesRef,
+      where("to", "==", currentUserNickname),
+      orderBy("timestamp", "desc")
+    );
+
+    onSnapshot(q, (snapshot) => {
+      const unread = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if (!data.read) unread.push({ id: doc.id, ...data });
+      });
+
+      if (unread.length > 0) {
+        alarmDot.style.display = "block";
+        alarmList.innerHTML = "";
+
+        const senders = new Set();
+        unread.forEach((msg) => {
+          if (!senders.has(msg.from)) {
+            senders.add(msg.from);
+
+            const div = document.createElement("div");
+            div.style.padding = "10px";
+            div.style.borderBottom = "1px solid #eee";
+            div.style.cursor = "pointer";
+
+            const content =
+              msg.content.length > 30 ? msg.content.slice(0, 30) + "..." : msg.content;
+
+            div.textContent = `${msg.from} ▶ ${content}`;
+            div.onclick = async () => {
+              const q2 = query(
+                collection(db, "messages"),
+                where("from", "==", msg.from),
+                where("to", "==", currentUserNickname),
+                where("read", "==", false)
+              );
+              const snap = await getDocs(q2);
+
+              div.remove();
+
+              const updatePromises = [];
+              snap.forEach((doc) => {
+                updatePromises.push(updateDoc(doc.ref, { read: true }));
+              });
+              await Promise.all(updatePromises);
+
+              const winName = `chat_with_${msg.from}`;
+              const url = `/pages/send-message.html?to=${encodeURIComponent(msg.from)}`;
+              const features = "width=500,height=600,resizable=yes,scrollbars=yes";
+              window.open(url, winName, features);
+
+              if (alarmList.children.length === 0) {
+                alarmList.innerHTML = "<div style='padding:10px;'>새로운 메시지가 없습니다.</div>";
+              }
+
+              const now = new Date();
+              await setDoc(
+                doc(db, "users", currentUserNickname, "recentReads", msg.from),
+                { lastRead: now }
+              );
+            };
+
+            alarmList.appendChild(div);
+          }
+        });
+      } else {
+        alarmDot.style.display = "none";
+        alarmList.innerHTML = "<div style='padding:10px;'>새로운 메시지가 없습니다.</div>";
+      }
+    });
+  } else {
+    loginBtn.textContent = "로그인";
+    loginBtn.href = "login.html";
+    if (mypageBtn) mypageBtn.style.display = "none";
+  }
+});
+
+});
+
+  </script>
+
+</head>
+<body>
+  <div id="taskbar-sensor" style="position: fixed; top: 0; left: 0; width: 5px; height: 100vh; z-index: 10000;"></div>
+
+  <!-- 상단바 -->
+  <header>
+    <div class="left-section">
+      <div class="logo">FOOTBALLOG</div>
+      <input class="search" placeholder="검색 :" />
+    </div>
+   <div class="right-section">
+  <div class="alarm-wrapper">
+  <button id="alarmBtn" class="material-icon-btn">
+    <span class="material-icons">notifications</span>
+    <span id="alarmDot"></span>
+  </button>
+  <div id="alarmList"></div>
+</div>
+
+  <div class="auth-wrapper">
+    <div class="auth-top">
+      <a href="mypage.html" id="mypageBtn" class="mypage-btn" style="display: none;">마이페이지</a>
+      <a href="login.html" class="login-btn">로그인</a>
+      <button class="menu-btn" onclick="toggleRightMenu()">☰</button>
+    </div>
+    <!-- 여기에 환영 메시지 추가도 가능 -->
+    <!-- <div id="welcome-message" class="tab-welcome" style="display: none;"></div> -->
+  </div>
+</div>
+
+  </header>
+
+<nav class="tab-menu">
+  <div class="tab-left-spacer"></div>
+
+  <div class="tab-center">
+    <a href="home.html">홈</a>
+    <a href="schedule.html">일정</a>
+    <a href="ranking.html">순위</a>
+    <a href="team-info.html" class="active">팀 정보</a>
+  </div>
+
+  <div id="welcome-message" class="tab-welcome" style="display: none;">
+    환영합니다, 사용자님
+  </div>
+</nav>
+
+
+
+  <div class="league-filter-container">
+  <label for="league-filter">리그 선택</label>
+  <select id="league-filter">
+    <option value="전체">전체</option>
+    <option value="프리미어리그">프리미어리그</option>
+    <option value="라리가">라리가</option>
+    <option value="분데스리가">분데스리가</option>
+    <option value="세리에A">세리에A</option>
+    <option value="리그1">리그1</option>
+    <option value="에레디비시">에레디비시</option>
+    <option value="챔피언스리그">챔피언스리그</option>
+    <option value="유로파리그">유로파리그</option>
+    <option value="클럽월드컵">클럽월드컵</option>
+    <option value="EFL컵">EFL컵</option>
+    <option value="The FA컵">The FA컵</option>
+    <option value="코파델레이">코파델레이</option>
+  </select>
+</div>
+
+
+
+  <!-- 팀 목록 -->
+  <main style="padding: 30px;">
+    <h1>팀 목록</h1>
+    <div class="team-list" id="dynamic-team-list"></div>
+  </main>
+
+  <footer id="taskbar">
+    <div id="taskbar-icons"></div>
+    <div class="taskbar-home">⌂</div>
+  </footer>
+
+  <div id="right-menu-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="margin: 0;">메뉴</h3>
+      <button onclick="toggleRightMenu()" style="border: none; background: none; font-size: 18px; cursor: pointer;">≫</button>
+    </div>
+    <ul>
+      <li onclick="handleMenuClick('football-news')">축구 뉴스</li>
+      <li onclick="handleMenuClick('community')">커뮤니티</li>
+      <li onclick="handleMenuClick('goods-shopping')">굿즈 쇼핑</li>
+      <li onclick="handleMenuClick('match-stats')">경기 통계</li>
+      <li onclick="handleMenuClick('match-broadcast')">경기 중계</li>
+      <li onclick="handleMenuClick('football-video')">축구 영상</li>
+      <li onclick="handleMenuClick('neighbors')">이웃</li></ul>
+  </div>
+
+
+
+
+
+  </style>
+
+<script>
+  const leagueNameMap = {
+    "프리미어리그": "Premier League",
+    "라리가": "La Liga",
+    "분데스리가": "Bundesliga",
+    "세리에A": "Serie A",
+    "리그1": "Ligue 1",
+    "에레디비시": "Eredivisie",
+    "챔피언스리그": "UEFA Champions League",
+    "유로파리그": "UEFA Europa League",
+    "클럽월드컵": "FIFA Club World Cup",
+    "EFL컵": "EFL Cup",
+    "The FA컵": "FA Cup",
+    "코파델레이": "Copa del Rey"
+  };
+
+  const listContainer = document.getElementById("dynamic-team-list");
+  const leagueSelect = document.getElementById("league-filter");
+  const searchInput = document.querySelector(".search");
+
+  let allTeams = [];
+  let selectedLeague = "전체";
+  let searchKeyword = "";
+
+  function renderTeams() {
+    listContainer.innerHTML = "";
+
+    const engLeague = leagueNameMap[selectedLeague] || null;
+
+    const filtered = allTeams.filter(team => {
+      const name = team.team?.name || team.name || "";
+      const matchesLeague = selectedLeague === "전체" || (team.leagues && team.leagues.includes(engLeague));
+      const matchesSearch = name.toLowerCase().includes(searchKeyword);
+      return matchesLeague && matchesSearch;
+    });
+
+    filtered.forEach(team => {
+      const teamInfo = team.team;
+      const teamName = teamInfo.name || "";
+      const filename = teamName.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+      const div = document.createElement("div");
+      div.className = "team-card";
+      div.innerHTML = `
+        <a href="teamdata/${filename}.html" style="text-decoration:none;color:inherit">
+          <img src="${teamInfo.logo}" alt="${teamName}" class="team-logo">
+          <h3>${teamName}</h3>
+        </a>
+      `;
+      listContainer.appendChild(div);
+    });
+  }
+
+  // 초기 데이터 로딩
+  fetch("teamdata/teams_with_leagues.json")
+    .then(res => res.json())
+    .then(data => {
+      allTeams = data.response || [];
+      renderTeams();
+    });
+
+  // 리그 선택 이벤트
+  leagueSelect.addEventListener("change", (e) => {
+    selectedLeague = e.target.value;
+    renderTeams();
+  });
+
+  // 실시간 검색 필터링
+  searchInput.addEventListener("input", (e) => {
+    searchKeyword = e.target.value.trim().toLowerCase();
+    renderTeams();
+  });
+</script>
+
+</body>
+</html>

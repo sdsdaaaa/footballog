@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>아스날 - 팀 상세 정보</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .team-header img { width: 100px; }
+    .player-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 5px;
+    }
+    .player-card {
+      display: inline-block;
+      width: 150px;
+      text-align: center;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="team-header">
+    <h1>아스날</h1>
+    <img src="https://crests.football-data.org/57.png" alt="아스날 로고">
+    <p><strong>설립:</strong> 1886년</p>
+    <p><strong>홈구장:</strong> 에미레이츠 스타디움</p>
+    <p><strong>감독:</strong> 미켈 아르테타 (스페인)</p>
+  </div>
+
+  <h2>🏆 트로피</h2>
+  <ul>
+    <li>프리미어리그: 13회</li>
+    <li>FA컵: 14회</li>
+    <li>커뮤니티 실드: 17회</li>
+    <li>UEFA 컵위너스컵: 1회</li>
+    <li>UEFA 챔피언스리그: 준우승 1회</li>
+  </ul>
+
+  <h2>📖 소개</h2>
+  <p>
+    아스날 FC는 런던을 연고로 하는 잉글랜드 프리미어리그 소속 클럽이며, 1886년에 창단되었다.<br>
+    '북런던 더비'로 알려진 토트넘 홋스퍼와의 라이벌전으로도 유명하다.<br>
+    2003–04 시즌에는 무패 우승을 달성하며 '인빈서블스'로 불리며 역사에 남았고,<br>
+    현재는 미켈 아르테타 감독 지휘 아래 젊고 역동적인 축구로 다시 전성기를 노리고 있다.
+  </p>
+
+  <h2>👥 주요 선수</h2>
+  <div>
+    <div class="formation">
+      <div class="row">
+        <div class="player-card">라야<br><span>골키퍼</span></div>
+      </div>
+
+      <div class="row">
+        <div class="player-card">화이트<br><span>RB</span></div>
+        <div class="player-card">가브리엘<br><span>CB</span></div>
+        <div class="player-card">살리바<br><span>CB</span></div>
+        <div class="player-card">진첸코<br><span>LB</span></div>
+      </div>
+
+      <div class="row">
+        <div class="player-card">파르티<br><span>CDM</span></div>
+        <div class="player-card">외데고르<br><span>CM</span></div>
+        <div class="player-card">데클란 라이스<br><span>CM</span></div>
+      </div>
+
+      <div class="row">
+        <div class="player-card">사카<br><span>RW</span></div>
+        <div class="player-card">트로사르<br><span>CF</span></div>
+        <div class="player-card">마르티넬리<br><span>LW</span></div>
+      </div>
+    </div>
+
+    <style>
+      .player-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .player-card {
+        width: 200px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        text-align: center;
+        background-color: #fff;
+      }
+
+      .player-card img {
+        width: 100%;
+        height: auto;
+      }
+
+      .player-card .info {
+        padding: 10px;
+      }
+
+      body {
+        background-color: #fbecec;
+        font-family: 'Segoe UI', sans-serif;
+        color: #222;
+      }
+
+      .player-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        padding: 30px;
+      }
+
+      .player-card {
+        width: 180px;
+        padding: 15px;
+        background-color: #EF0107; /* 아스날 레드 */
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        color: #fff;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .player-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      }
+
+      .player-card h3 {
+        font-size: 1.1em;
+        margin-bottom: 8px;
+      }
+
+      .player-card p {
+        font-size: 0.9em;
+        color: #d1f3f0;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', 'Pretendard', sans-serif;
+        background: linear-gradient(to bottom right, #EF0107 30%, #023474 100%);
+        background-attachment: fixed;
+        color: #fff;
+      }
+
+      .formation {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 50px;
+        padding: 60px 20px;
+      }
+
+      .row {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+      }
+
+      .player-card {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 20px;
+        padding: 20px 30px;
+        min-width: 140px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.3rem;
+        letter-spacing: 0.5px;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .player-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+      }
+
+      .player-card span {
+        display: block;
+        margin-top: 8px;
+        font-size: 1.1rem;
+        font-weight: 400;
+        color: #e0ffe6;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+    </style>
+</body>
+</html>

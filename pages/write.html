@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>글쓰기</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; padding: 30px; background: #f9fafc; }
+    input, textarea { width: 100%; margin-bottom: 15px; padding: 10px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h1>글쓰기</h1>
+  <input id="title" placeholder="제목 입력">
+  <textarea id="content" placeholder="내용 입력" rows="10"></textarea>
+  <button onclick="savePost()">등록</button>
+
+<script type="module">
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA02saQDvqMQbDLrD5UMwX848E6eFO-rUU",
+    authDomain: "northern-cooler-461505-d5.firebaseapp.com",
+    projectId: "northern-cooler-461505-d5",
+    storageBucket: "northern-cooler-461505-d5.appspot.com",
+    messagingSenderId: "57199546606",
+    appId: "1:57199546606:web:b4e134094c86623e25a3ff"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentUser;
+  let nickname = "";
+
+  let nicknameLoaded = false;
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    alert("로그인 후 이용 가능합니다.");
+    location.href = "login.html";
+    return;
+  }
+
+  currentUser = user;
+  const userRef = doc(db, "users", currentUser.uid);
+  const userSnap = await getDoc(userRef);
+  nickname = userSnap.exists() ? userSnap.data().nickname : currentUser.email;
+  nicknameLoaded = true; // ✅ 로딩 완료 표시
+});
+
+window.savePost = function () {
+  if (!nicknameLoaded) {
+    alert("닉네임 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+    return;
+  }
+
+  const title = document.getElementById("title").value.trim();
+  const content = document.getElementById("content").value.trim();
+
+  // 🔒 유효성 검사: 1글자 이상 입력 여부 확인
+  if (title.length < 1) {
+    alert("제목을 1글자 이상 입력해주세요.");
+    return;
+  }
+
+  if (content.length < 1) {
+    alert("내용을 1글자 이상 입력해주세요.");
+    return;
+  }
+
+  const type = new URLSearchParams(location.search).get("type") || "free";
+  const posts = JSON.parse(localStorage.getItem("posts") || "[]");
+
+  const newPost = {
+    id: String(Date.now()),
+    type,
+    title,
+    content,
+    date: new Date().toLocaleDateString(),
+    author: nickname,
+    views: 0,
+    comments: []
+  };
+
+  posts.push(newPost);
+  localStorage.setItem("posts", JSON.stringify(posts));
+  alert("등록 완료!");
+  location.href = `board.html?type=${type}`;
+};
+
+</script>
+
+</body>
+</html>

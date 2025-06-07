@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>메시지 보내기 - FOOTBALLOG</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #ffffff;
+      color: white;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+       overflow: hidden;
+    }
+    header {
+      background: #1c2b3e;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    #chat-box {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 10px 15px;
+      border-radius: 12px;
+      margin: 6px 0;
+      word-break: break-word;
+    }
+
+    .my-message {
+      background-color: #00aaff;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 0;
+      margin-left: auto;
+    }
+
+    .their-message {
+      background-color: #3e4c5a;
+      color: white;
+      align-self: flex-start;
+      border-bottom-left-radius: 0;
+      margin-right: auto;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: #ccc;
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    footer {
+      display: flex;
+      padding: 10px;
+      background: #1c2b3e;
+    }
+    input[type="text"] {
+      flex-grow: 1;
+      padding: 10px;
+      border-radius: 4px;
+      border: none;
+    }
+    button {
+      margin-left: 8px;
+      padding: 10px 20px;
+      background-color: #00aaff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button onclick="goBack()" style="background:none; border:none; color:white; font-size:16px; cursor:pointer;">← 뒤로</button>
+    <span id="target-name">대화 상대</span>
+    <div></div>
+  </header>
+
+  <div id="chat-box"></div>
+
+  <footer>
+    <input type="text" id="chat-input" placeholder="메시지를 입력하세요" />
+    <button onclick="sendMessage()">전송</button>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import {
+      getFirestore, collection, query, where,
+      getDocs, addDoc, onSnapshot, orderBy
+    } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA02saQDvqMQbDLrD5UMwX848E6eFO-rUU",
+      authDomain: "northern-cooler-461505-d5.firebaseapp.com",
+      projectId: "northern-cooler-461505-d5",
+      storageBucket: "northern-cooler-461505-d5.appspot.com",
+      messagingSenderId: "57199546606",
+      appId: "1:57199546606:web:b4e134094c86623e25a3ff"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const chatBox = document.getElementById("chat-box");
+    const input = document.getElementById("chat-input");
+    const targetNameEl = document.getElementById("target-name");
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const friendNickname = urlParams.get("to"); // ?to=상대 닉네임
+    let currentUser = null;
+    let currentUserNickname = null;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        alert("로그인 후 이용 가능합니다.");
+        window.location.href = "login.html";
+        return;
+      }
+      currentUser = user;
+
+      // 내 닉네임 가져오기
+      const userSnap = await getDocs(query(collection(db, "users"), where("uid", "==", user.uid)));
+      currentUserNickname = userSnap.docs[0]?.data().nickname || null;
+
+      if (!currentUserNickname || !friendNickname) {
+        alert("잘못된 접근입니다.");
+        window.location.href = "neighbors.html";
+        return;
+      }
+
+      targetNameEl.textContent = friendNickname;
+      listenToChat();
+    });
+
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    window.sendMessage = async function () {
+      const text = input.value.trim();
+      if (!text || !currentUserNickname || !friendNickname) return;
+
+      const message = {
+        from: currentUserNickname,
+        to: friendNickname,
+        participants: [currentUserNickname, friendNickname],
+        content: text,
+        timestamp: new Date()
+      };
+
+      await addDoc(collection(db, "messages"), message);
+      input.value = "";
+    };
+
+    function listenToChat() {
+      const messagesRef = collection(db, "messages");
+
+      const q = query(
+        messagesRef,
+        where("participants", "array-contains", currentUserNickname),
+        orderBy("timestamp")
+      );
+
+      onSnapshot(q, snapshot => {
+        const filtered = snapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .filter(
+            msg =>
+              (msg.from === currentUserNickname && msg.to === friendNickname) ||
+              (msg.from === friendNickname && msg.to === currentUserNickname)
+          );
+
+        filtered.sort((a, b) => a.timestamp?.seconds - b.timestamp?.seconds);
+        chatBox.innerHTML = "";
+        filtered.forEach(data => {
+          const isMine = data.from === currentUserNickname;
+          const div = document.createElement("div");
+          div.className = "message " + (isMine ? "my-message" : "their-message");
+          div.innerHTML = `
+            <div>${data.content}</div>
+            <div class="meta">${formatTime(data.timestamp?.seconds)}</div>
+          `;
+          chatBox.appendChild(div);
+        });
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+    }
+
+    function formatTime(seconds) {
+      const date = new Date(seconds * 1000);
+      return date.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    window.goBack = function () {
+      window.location.href = "neighbors.html";
+    };
+  </script>
+</body>
+</html>

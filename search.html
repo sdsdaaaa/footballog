@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Footballog - 검색</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="js/script.js" defer></script>
+<!-- Firebase SDK 연결 -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA02saQDvqMQbDLrD5UMwX848E6eFO-rUU",
+  authDomain: "northern-cooler-461505-d5.firebaseapp.com",
+  projectId: "northern-cooler-461505-d5",
+  storageBucket: "northern-cooler-461505-d5.appspot.com",
+  messagingSenderId: "57199546606",
+  appId: "1:57199546606:web:b4e134094c86623e25a3ff",
+  measurementId: "G-562VJ9VE2P"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+let queryParam = ""; // 전역으로 선언 (맨 위에 위치)
+
+
+window.addEventListener("DOMContentLoaded", () => {
+  const loginBtn = document.querySelector(".login-btn");
+  const mypageBtn = document.getElementById("mypageBtn");
+  const alarmBtn = document.getElementById("alarmBtn");
+  const alarmList = document.getElementById("alarmList");
+  const alarmDot = document.getElementById("alarmDot");
+
+  if (alarmBtn) {
+    alarmBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isVisible = alarmList.style.display === "block";
+
+      if (!isVisible && alarmList.innerHTML.trim() === "") {
+        alarmList.innerHTML = `<div style='padding:10px; color:#999; text-align:center;'>새로운 메시지가 없습니다.</div>`;
+      }
+
+      if (!isVisible) {
+        alarmDot.style.display = "none";
+      }
+
+      alarmList.style.display = isVisible ? "none" : "block";
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    if (!alarmBtn.contains(e.target) && !alarmList.contains(e.target)) {
+      alarmList.style.display = "none";
+    }
+  });
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      loginBtn.textContent = "로그아웃";
+      loginBtn.href = "#";
+      loginBtn.onclick = () => {
+        signOut(auth).then(() => {
+          alert("로그아웃되었습니다.");
+          location.reload();
+        });
+      };
+      if (mypageBtn) mypageBtn.style.display = "inline-block";
+
+      const db = getFirestore();
+      const userDocRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userDocRef);
+      if (!userSnap.exists()) return;
+
+      const currentUserNickname = userSnap.data().nickname;
+
+      const welcomeBox = document.getElementById("welcome-message");
+      if (welcomeBox) {
+        welcomeBox.textContent = `환영합니다, ${currentUserNickname}님`;
+        welcomeBox.style.display = "block";
+      }
+
+      const messagesRef = collection(db, "messages");
+      const q = query(
+        messagesRef,
+        where("to", "==", currentUserNickname),
+        orderBy("timestamp", "desc")
+      );
+
+      onSnapshot(q, (snapshot) => {
+        const unread = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          if (!data.read) unread.push({ id: doc.id, ...data });
+        });
+
+        if (unread.length > 0) {
+          alarmDot.style.display = "block";
+          alarmList.innerHTML = "";
+
+          const senders = new Set();
+          unread.forEach((msg) => {
+            if (!senders.has(msg.from)) {
+              senders.add(msg.from);
+
+              const div = document.createElement("div");
+              div.style.padding = "10px";
+              div.style.borderBottom = "1px solid #eee";
+              div.style.cursor = "pointer";
+
+              const content =
+                msg.content.length > 30 ? msg.content.slice(0, 30) + "..." : msg.content;
+
+              div.textContent = `${msg.from} ▶ ${content}`;
+              div.onclick = async () => {
+                const q2 = query(
+                  collection(db, "messages"),
+                  where("from", "==", msg.from),
+                  where("to", "==", currentUserNickname),
+                  where("read", "==", false)
+                );
+                const snap = await getDocs(q2);
+
+                div.remove();
+                const updatePromises = [];
+                snap.forEach((doc) => {
+                  updatePromises.push(updateDoc(doc.ref, { read: true }));
+                });
+                await Promise.all(updatePromises);
+
+                const winName = `chat_with_${msg.from}`;
+                const url = `/pages/send-message.html?to=${encodeURIComponent(msg.from)}`;
+                const features = "width=500,height=600,resizable=yes,scrollbars=yes";
+                window.open(url, winName, features);
+
+                if (alarmList.children.length === 0) {
+                  alarmList.innerHTML = "<div style='padding:10px;'>새로운 메시지가 없습니다.</div>";
+                }
+
+                const now = new Date();
+                await setDoc(
+                  doc(db, "users", currentUserNickname, "recentReads", msg.from),
+                  { lastRead: now }
+                );
+              };
+
+              alarmList.appendChild(div);
+            }
+          });
+        } else {
+          alarmDot.style.display = "none";
+          alarmList.innerHTML = "<div style='padding:10px;'>새로운 메시지가 없습니다.</div>";
+        }
+      });
+    } else {
+      loginBtn.textContent = "로그인";
+      loginBtn.href = "login.html";
+      if (mypageBtn) mypageBtn.style.display = "none";
+    }
+  });
+
+
+
+document.getElementById("loadMoreBtn").addEventListener("click", () => {
+  renderNewsChunk();
+  renderVideoChunk();
+
+  const noMoreNews = newsIndex >= newsResults.length;
+  const noMoreVideos = videoIndex >= videoResults.length;
+
+  if (noMoreNews && noMoreVideos) {
+    document.getElementById("loadMoreBtn").style.display = "none";
+  }
+});
+
+
+});
+</script>
+
+
+<script>
+
+
+let newsResults = []; // 전체 뉴스
+let videoResults = []; // 전체 영상
+let newsIndex = 0;
+let videoIndex = 0;
+const newsChunk = 8;
+const videoChunk = 4;
+
+
+
+window.addEventListener("DOMContentLoaded", () => {
+  const queryParam = new URLSearchParams(window.location.search).get("query");
+
+  // 제목 텍스트 설정
+  const searchTitle = document.getElementById("search-title");
+  if (queryParam && searchTitle) {
+    searchTitle.textContent = `"${queryParam}" 검색 결과`;
+  }
+
+
+//  Google 뉴스 검색
+ const searchNews = document.getElementById("search-news");
+if (queryParam && searchNews) {
+  const xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function () {
+    if (this.readyState === this.DONE) {
+      try {
+        const data = JSON.parse(this.responseText);
+        const results = data?.results;
+
+        if (!results || results.length === 0) {
+          searchNews.innerHTML = "<p>검색 결과가 없습니다.</p>";
+          return;
+        }
+
+        newsResults = results;       // ✅ 저장
+        searchNews.innerHTML = "";   // ✅ 초기화
+        renderNewsChunk();           // ✅ 첫 페이지 렌더링
+
+      } catch (e) {
+        console.error("Google 뉴스 파싱 오류:", e);
+        searchNews.innerHTML = "<p>뉴스를 불러오는 데 문제가 발생했습니다.</p>";
+      }
+    }
+  };
+
+  xhr.open("GET", `https://google-search74.p.rapidapi.com/?query=${encodeURIComponent(queryParam)}&limit=100&related_keywords=true`);
+  xhr.setRequestHeader("x-rapidapi-key", "16bcdec18emsh8432e33e909b725p159395jsned7a8c858898");
+  xhr.setRequestHeader("x-rapidapi-host", "google-search74.p.rapidapi.com");
+  xhr.send();
+}
+
+
+
+  // ✅ 선수 정보 검색 - Wikipedia API 사용 (이미지 포함)
+const playerBox = document.getElementById("search-player");
+if (queryParam && playerBox) {
+  // 먼저 검색
+  const searchUrl = `https://ko.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(queryParam)}&format=json&origin=*`;
+  
+  fetch(searchUrl)
+    .then(res => res.json())
+    .then(searchData => {
+      const results = searchData.query?.search;
+      if (!results || results.length === 0) {
+        playerBox.innerHTML = "<p>관련 선수 정보를 찾을 수 없습니다.</p>";
+        return;
+      }
+
+      const topResult = results[0];
+      const title = topResult.title;
+      const snippet = topResult.snippet;
+      const pageId = topResult.pageid;
+      const pageUrl = `https://ko.wikipedia.org/wiki/${encodeURIComponent(title)}`;
+
+      // 이미지 포함 정보 요청
+      const detailUrl = `https://ko.wikipedia.org/w/api.php?action=query&pageids=${pageId}&prop=pageimages|pageprops&format=json&pithumbsize=300&origin=*`;
+      
+      fetch(detailUrl)
+        .then(res => res.json())
+        .then(detailData => {
+          const pageData = detailData.query.pages[pageId];
+          const thumb = pageData?.thumbnail?.source;
+
+          playerBox.innerHTML = `
+            <div class="player-card">
+              ${thumb ? `<img src="${thumb}" alt="${title}">` : ""}
+              <div class="player-info">
+                <h3><a href="${pageUrl}" target="_blank">${title}</a></h3>
+                <p>${snippet}...</p>
+              </div>
+            </div>
+          `;
+        })
+        .catch(e => {
+          console.error("세부 정보 파싱 오류:", e);
+          playerBox.innerHTML = "<p>선수 정보를 불러오는 데 실패했습니다.</p>";
+        });
+
+    })
+    .catch(e => {
+      console.error("위키백과 파싱 오류:", e);
+      playerBox.innerHTML = "<p>선수 정보를 불러오는 데 실패했습니다.</p>";
+    });
+}
+
+  // ✅ 유튜브 영상 검색
+const videoBox = document.getElementById("search-videos");
+if (queryParam && videoBox) {
+  const xhrVideo = new XMLHttpRequest();
+  xhrVideo.onreadystatechange = function () {
+    if (this.readyState === this.DONE) {
+      try {
+        const data = JSON.parse(this.responseText);
+        const videos = data.contents?.filter(item => item.video);
+
+        if (!videos || videos.length === 0) {
+          videoBox.innerHTML = "<p>관련 영상이 없습니다.</p>";
+          return;
+        }
+
+        videoResults = videos;       // ✅ 전체 영상 저장
+        videoBox.innerHTML = "";     // ✅ 초기화
+        renderVideoChunk();          // ✅ 첫 chunk 렌더링
+
+      } catch (e) {
+        console.error("영상 파싱 오류:", e);
+        videoBox.innerHTML = "<p>영상을 불러오는 데 문제가 발생했습니다.</p>";
+      }
+    }
+  };
+  xhrVideo.open("GET", `https://youtube138.p.rapidapi.com/search/?q=${encodeURIComponent(queryParam)}&hl=ko&gl=KR`);
+  xhrVideo.setRequestHeader("x-rapidapi-key", "16bcdec18emsh8432e33e909b725p159395jsned7a8c858898");
+  xhrVideo.setRequestHeader("x-rapidapi-host", "youtube138.p.rapidapi.com");
+  xhrVideo.send();
+}
+
+
+
+
+  // ✅ AI 응답 (이 자리에 넣으세요)
+const aiBox = document.getElementById("ai-response");
+const aiContent = document.getElementById("ai-response-content");
+
+if (queryParam && aiBox && aiContent) {
+  aiBox.style.display = "block";
+
+  const data = JSON.stringify({
+    message: `${queryParam}에 대해 알려줘`,
+    conversation_id: null,
+    mode: "CHAT",
+    markdown: false
+  });
+
+  const xhr = new XMLHttpRequest();
+
+  xhr.onreadystatechange = function () {
+    if (this.readyState === XMLHttpRequest.DONE) {
+      try {
+        const res = JSON.parse(this.responseText);
+
+        if (res?.data?.message) {
+          let html = `<p style="white-space:pre-line;">${res.data.message}</p>`;
+
+          // citations 렌더링
+          if (res.data.citations && res.data.citations.length > 0) {
+            html += `<div style="margin-top: 15px;"><strong>📎 참고 링크:</strong><ul style="padding-left: 18px;">`;
+            res.data.citations.forEach(cite => {
+              html += `
+                <li style="margin-bottom:6px;">
+                  <a href="${cite.url}" target="_blank" style="text-decoration:none; color:#1a73e8;">
+                    ${cite.icon_url ? `<img src="${cite.icon_url}" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;">` : ''}
+                    ${cite.title}
+                  </a>
+                </li>
+              `;
+            });
+            html += `</ul></div>`;
+          }
+
+          aiContent.innerHTML = html;
+        } else {
+          aiContent.textContent = "AI 응답을 불러오지 못했습니다.";
+        }
+      } catch (e) {
+        aiContent.textContent = "AI 응답 파싱 중 오류가 발생했습니다.";
+      }
+    }
+  };
+
+  xhr.open("POST", "https://copilot5.p.rapidapi.com/copilot");
+  xhr.setRequestHeader("x-rapidapi-key", "16bcdec18emsh8432e33e909b725p159395jsned7a8c858898");
+  xhr.setRequestHeader("x-rapidapi-host", "copilot5.p.rapidapi.com");
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.send(data);
+}
+
+
+
+});
+
+
+
+
+
+// 뉴스 렌더링 함수
+function renderNewsChunk() {
+  const chunk = newsResults.slice(newsIndex, newsIndex + newsChunk);
+  if (chunk.length === 0) return;
+
+  const html = chunk.map(item => `
+    <div class="news-card">
+      <a href="${item.url}" target="_blank" class="news-title">${item.title}</a>
+      <div class="news-meta">${new URL(item.url).hostname}</div>
+      <div class="news-desc">${item.description}</div>
+    </div>
+  `).join('');
+  document.getElementById("search-news").insertAdjacentHTML("beforeend", html);
+  newsIndex += newsChunk;
+}
+
+// 영상 렌더링 함수
+function renderVideoChunk() {
+  const chunk = videoResults.slice(videoIndex, videoIndex + videoChunk);
+  if (chunk.length === 0) return;
+
+  const html = chunk.map(v => {
+    const vid = v.video;
+    return `
+      <div class="video-card">
+        <iframe src="https://www.youtube.com/embed/${vid.videoId}" allowfullscreen></iframe>
+        <p>${vid.title}</p>
+      </div>
+    `;
+  }).join('');
+  document.getElementById("search-videos").insertAdjacentHTML("beforeend", html);
+  videoIndex += videoChunk;
+}
+
+
+
+</script>
+
+
+<style>
+/* 전체 레이아웃 */
+/* 🔷 레이아웃 전체 */
+.search-layout {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+.left-panel {
+  flex: 1 1 60%;
+  min-width: 320px;
+}
+.right-panel {
+  flex: 1 1 35%;
+  min-width: 300px;
+}
+
+/* 📰 뉴스 카드 스타일 */
+.news-card {
+  background: #3de0c8;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.news-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+.news-card a {
+  text-decoration: none;
+}
+.news-title {
+  font-size: 17px;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+.news-title:hover {
+  text-decoration: underline;
+}
+.news-meta {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 8px;
+}
+.news-desc {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.6;
+}
+
+/* 🎥 유튜브 영상 카드 스타일 */
+#search-videos .video-card {
+  background: #7ea7ff;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+#search-videos iframe {
+  width: 100%;
+  height: 230px;
+  border-radius: 10px;
+  border: none;
+}
+#search-videos p {
+  font-size: 15px;
+  color: #333;
+  margin-top: 12px;
+  line-height: 1.4;
+}
+
+/* ⚽ 선수 정보 카드 */
+#search-player .player-card {
+  display: flex;
+  gap: 18px;
+  background: #5dc5f1;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+#search-player .player-card img {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+#search-player .player-info {
+  flex-grow: 1;
+}
+#search-player .player-info h3 {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+#search-player .player-info p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #444;
+  line-height: 1.5;
+}
+#ai-response {
+  background: #fff7e6;
+  color: #222;
+  font-size: 15px;
+  line-height: 1.6;
+  height: auto;
+  weight: 100%;
+}
+#ai-response h3 {
+  margin-top: 0;
+  color: #f57c00;
+}
+
+
+</style>
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+  <!-- 고정 감지 센서 -->
+  <div id="taskbar-sensor" style="position: fixed; top: 0; left: 0; width: 5px; height: 100vh; z-index: 10000;"></div>
+
+  <!-- 상단바 -->
+  <header>
+    <div class="left-section">
+      <div class="logo">FOOTBALLOG</div>
+      <input class="search" placeholder="검색 :" />
+    </div>
+    <div class="right-section">
+      <div class="alarm-wrapper">
+        <button id="alarmBtn" class="material-icon-btn">
+          <span class="material-icons">notifications</span>
+          <span id="alarmDot"></span>
+        </button>
+        <div id="alarmList"></div>
+      </div>
+      <div class="auth-wrapper">
+        <div class="auth-top">
+          <a href="mypage.html" id="mypageBtn" class="mypage-btn" style="display: none;">마이페이지</a>
+          <a href="login.html" class="login-btn">로그인</a>
+          <button class="menu-btn" onclick="toggleRightMenu()">☰</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 탭 메뉴 -->
+  <nav class="tab-menu">
+    <div class="tab-left-spacer"></div>
+    <div class="tab-center">
+      <a href="home.html">홈</a>
+      <a href="schedule.html">일정</a>
+      <a href="ranking.html">순위</a>
+      <a href="team-info.html">팀 정보</a>
+    </div>
+    <div id="welcome-message" class="tab-welcome" style="display: none;">환영합니다, 사용자님</div>
+  </nav>
+
+  <!-- 본문 콘텐츠 영역 -->
+  <main style="padding: 30px; min-height: 70vh;">
+      <!-- 🔍 AI 응답 상자 (선수 정보 위에 배치) -->
+<div id="ai-response" style="background: #f4f4f4; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 40px; display: none;">
+  <h3>AI 요약</h3>
+  <div id="ai-response-content">AI 응답을 불러오는 중입니다...</div>
+</div>
+
+
+    <div class="search-layout">
+
+  <div class="left-panel">
+    <h3 style="margin-top: 30px;">관련 선수 정보</h3>
+    <div id="search-player">선수 정보 로딩 중...</div>
+    <h3 id="search-title">검색 결과</h3>
+    <div id="search-news">뉴스 로딩 중...</div>
+  </div>
+
+  <div class="right-panel">
+    <h3>관련 영상</h3>
+    <div id="search-videos">영상 로딩 중...</div>
+  </div>
+
+  <div style="text-align: center; margin-top: 40px;">
+  <button id="loadMoreBtn" style="padding: 10px 20px; font-size: 16px; background: #444; color: white; border: none; border-radius: 8px; cursor: pointer;">
+    더 보기
+  </button>
+</div>
+
+  </main>
+
+  <!-- 작업 표시줄 -->
+  <footer id="taskbar">
+    <div id="taskbar-icons"></div>
+    <div class="taskbar-home">⌂</div>
+  </footer>
+
+  <!-- 우측 메뉴 -->
+  <div id="right-menu-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="margin: 0;">메뉴</h3>
+      <button onclick="toggleRightMenu()" style="border: none; background: none; font-size: 18px; cursor: pointer;">≫</button>
+    </div>
+    <ul>
+      <li onclick="handleMenuClick('football-news')">축구 뉴스</li>
+      <li onclick="handleMenuClick('community')">커뮤니티</li>
+      <li onclick="handleMenuClick('goods-shopping')">굿즈 쇼핑</li>
+      <li onclick="handleMenuClick('match-stats')">경기 통계</li>
+      <li onclick="handleMenuClick('match-broadcast')">경기 중계</li>
+      <li onclick="handleMenuClick('football-video')">축구 영상</li>
+      <li onclick="handleMenuClick('neighbors')">이웃</li>
+    </ul>
+  </div>
+
+  <!-- 우클릭 메뉴 -->
+  <ul id="context-menu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; border-radius: 5px; padding: 0; margin: 0; list-style: none; z-index: 10000;">
+    <li id="ctx-close" style="padding: 8px 12px; cursor: pointer;">닫기</li>
+  </ul>
+
+
+
+
+
+
+</body>
+</html>

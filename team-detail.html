@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title id="title">팀 상세 정보</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 30px;
+      color: #fff;
+    }
+    .team-header img { width: 100px; }
+    .player-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      padding: 30px;
+    }
+    .player-card {
+      width: 180px;
+      padding: 15px;
+      border-radius: 20px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.3rem;
+      letter-spacing: 0.5px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .player-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+    }
+    .player-card span {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: #e0ffe6;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="team-header">
+    <h1 id="team-name">팀 이름</h1>
+    <img id="team-logo" src="" alt="팀 로고">
+    <p><strong>설립:</strong> <span id="founded"></span></p>
+    <p><strong>홈구장:</strong> <span id="stadium"></span></p>
+    <p><strong>감독:</strong> <span id="coach"></span></p>
+  </div>
+
+  <h2>🏆 트로피</h2>
+  <ul class="trophy-list" id="trophies"></ul>
+
+  <h2>👥 주요 선수</h2>
+  <div class="player-list" id="players"></div>
+
+  <script type="module">
+    const params = new URLSearchParams(location.search);
+    const teamId = params.get("team");
+
+    if (!teamId) {
+      document.body.innerHTML = "<h2>잘못된 접근입니다.</h2>";
+    } else {
+      fetch(`teamdata/${teamId}.json`)
+        .then(res => res.json())
+        .then(data => {
+          document.title = `${data.name} - 팀 정보`;
+          document.getElementById("title").textContent = `${data.name} - 팀 정보`;
+          document.getElementById("team-name").textContent = data.name;
+          document.getElementById("team-logo").src = data.logo;
+          document.getElementById("founded").textContent = data.founded;
+          document.getElementById("stadium").textContent = data.stadium;
+          document.getElementById("coach").textContent = data.coach;
+
+          const trophyList = document.getElementById("trophies");
+          data.trophies.forEach(t => {
+            const li = document.createElement("li");
+            li.textContent = t;
+            trophyList.appendChild(li);
+          });
+
+          const playerList = document.getElementById("players");
+          data.players.forEach(p => {
+            const div = document.createElement("div");
+            div.className = "player-card";
+            div.innerHTML = `<strong>${p.name}</strong><br><span>${p.position}</span>`;
+            playerList.appendChild(div);
+          });
+
+          document.body.style.background = data.background || "#000";
+          document.querySelectorAll(".player-card").forEach(card => {
+            card.style.background = "rgba(255, 255, 255, 0.1)";
+            card.style.border = "2px solid rgba(255, 255, 255, 0.4)";
+            card.style.color = "#fff";
+            card.style.backdropFilter = "blur(8px)";
+            card.style.boxShadow = "0 6px 15px rgba(0,0,0,0.3)";
+            card.addEventListener("mouseover", () => {
+              card.style.transform = "scale(1.05)";
+              card.style.boxShadow = "0 12px 24px rgba(0,0,0,0.4)";
+            });
+            card.addEventListener("mouseout", () => {
+              card.style.transform = "";
+              card.style.boxShadow = "0 6px 15px rgba(0,0,0,0.3)";
+            });
+          });
+        })
+        .catch(err => {
+          document.body.innerHTML = "<h2>해당 팀 정보를 찾을 수 없습니다.</h2>";
+          console.error(err);
+        });
+    }
+  </script>
+</body>
+</html>

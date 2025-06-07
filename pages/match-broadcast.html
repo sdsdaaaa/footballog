@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>축구 라이브 중계 - FOOTBALLOG</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .video-card {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    .video-card img {
+      width: 100%;
+      border-radius: 6px;
+    }
+    .video-info {
+      margin-top: 10px;
+    }
+    .video-title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .video-channel {
+      font-size: 14px;
+      color: #666;
+      margin-top: 4px;
+    }
+    .watch-button {
+      margin-top: 10px;
+      background: #2c7be5;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+    }
+    .watch-button:hover {
+      background: #1a5bb8;
+    }
+    .search-bar {
+      max-width: 500px;
+      margin: 0 auto 30px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .search-bar input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .search-bar button {
+      padding: 10px 20px;
+      background: #2c7be5;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .search-bar button:hover {
+      background: #1a5bb8;
+    }
+  </style>
+</head>
+<body>
+  <h1>⚽ 실시간 축구 라이브 영상</h1>
+
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="예: 축구 생중계, UCL Live 등">
+    <button onclick="searchLiveVideos()">검색</button>
+  </div>
+
+  <div class="video-grid" id="video-list"></div>
+
+  <script>
+    const apiKey = "AIzaSyBV3kxY962TDVFM9lhGZ-1chTatZtYui6I";
+
+    function searchLiveVideos(query = "축구 생중계") {
+      fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&eventType=live&type=video&maxResults=12&key=${apiKey}`)
+        .then(res => res.json())
+        .then(data => {
+          const list = document.getElementById('video-list');
+          list.innerHTML = '';
+
+          if (!data.items || data.items.length === 0) {
+            list.innerHTML = '<p style="text-align:center">⚠️ 현재 라이브 중인 축구 영상이 없습니다.</p>';
+            return;
+          }
+
+          data.items.forEach(item => {
+            const videoId = item.id.videoId;
+            const snippet = item.snippet;
+
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            card.innerHTML = `
+              <img src="${snippet.thumbnails.medium.url}" alt="${snippet.title}">
+              <div class="video-info">
+                <div class="video-title">${snippet.title}</div>
+                <div class="video-channel">${snippet.channelTitle}</div>
+                <a class="watch-button" href="https://www.youtube.com/watch?v=${videoId}" target="_blank">시청하기</a>
+              </div>
+            `;
+            list.appendChild(card);
+          });
+        });
+    }
+
+    function loadRapidAPILiveStream() {
+      const videoList = document.getElementById("video-list");
+
+      fetch("https://football-live-stream-api.p.rapidapi.com/link/truc-tiep-tran-dau-coquimbo-unido-vs-universidad-de-chile-2674554", {
+        method: "GET",
+        headers: {
+          "x-rapidapi-key": "16bcdec18emsh8432e33e909b725p159395jsned7a8c858898",
+          "x-rapidapi-host": "football-live-stream-api.p.rapidapi.com"
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        let streamHTML = "";
+
+        if (data.link) {
+          streamHTML = `
+            <div class="video-card">
+              <img src="https://img.freepik.com/free-vector/football-live-stream-banner-design-template_1017-45113.jpg" alt="Live Stream">
+              <div class="video-info">
+                <div class="video-title">🌍 외부 스트리밍 중계</div>
+                <div class="video-channel">Football Live API</div>
+                <a class="watch-button" href="${data.link}" target="_blank">시청하기</a>
+              </div>
+            </div>`;
+        } else if (data.iframe) {
+          streamHTML = `
+            <div class="video-card">
+              <div class="video-info">
+                <div class="video-title">🌍 외부 스트리밍 iframe</div>
+                ${data.iframe}
+              </div>
+            </div>`;
+        } else {
+          streamHTML = `<p style="text-align:center">⚠️ 스트리밍 데이터를 불러오지 못했습니다.</p>`;
+        }
+
+        videoList.insertAdjacentHTML("afterbegin", streamHTML);
+      })
+      .catch(err => {
+        console.error("🔴 RapidAPI 영상 불러오기 실패:", err);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadRapidAPILiveStream();   // RapidAPI 영상 추가
+      searchLiveVideos();         // 유튜브 라이브 검색
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+[
+  {
+    "id": "Arsenal",
+    "name": "아스날",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg"
+  },
+  {
+    "id": "Liverpool",
+    "name": "리버풀",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg"
+  },
+  {
+    "id": "Chelsea",
+    "name": "첼시",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg"
+  }
+]

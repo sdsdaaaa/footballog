@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>뉴캐슬 유나이티드 - 팀 상세 정보</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .team-header img { width: 100px; }
+    .player-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 5px;
+    }
+    .player-card {
+      display: inline-block;
+      width: 150px;
+      text-align: center;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="team-header">
+    <h1>뉴캐슬 유나이티드</h1>
+    <img src="https://crests.football-data.org/67.png" alt="뉴캐슬 로고">
+    <p><strong>설립:</strong> 1892년</p>
+    <p><strong>홈구장:</strong> 세인트 제임스 파크</p>
+    <p><strong>감독:</strong> 에디 하우 (잉글랜드)</p>
+  </div>
+
+  <h2>🏆 트로피</h2>
+  <ul>
+    <li>잉글리시 1부 리그 우승: 4회</li>
+    <li>FA컵: 6회</li>
+    <li>커뮤니티 실드: 1회</li>
+    <li>UEFA 인터토토컵: 1회</li>
+    <li>UEFA 챔피언스리그: 2023-24 시즌 복귀</li>
+  </ul>
+
+  <h2>📖 소개</h2>
+  <p>
+    뉴캐슬 유나이티드는 잉글랜드 북동부를 연고로 하는 프리미어리그 클럽으로,<br>
+    2021년 사우디아라비아 국부펀드(PIF)의 인수 이후 본격적인 투자가 이뤄지며 상위권 도약에 성공했다.<br>
+    열정적인 홈팬과 '세인트 제임스 파크'의 분위기로 유명하며, 최근 유럽 대항전 복귀에 성공했다.<br>
+    흑백 스트라이프 유니폼으로도 잘 알려져 있다.
+  </p>
+
+  <h2>👥 주요 선수</h2>
+  <div>
+    <div class="formation">
+      <div class="row">
+        <div class="player-card">닉 포프<br><span>골키퍼</span></div>
+      </div>
+
+      <div class="row">
+         <div class="player-card">트리피어<br><span>RB</span></div>
+        <div class="player-card">보트만<br><span>CB</span></div>
+        <div class="player-card">셰어<br><span>CB</span></div>
+        <div class="player-card">번<br><span>LB</span></div>
+      </div>
+
+      <div class="row">
+        <div class="player-card">귀마랑이스<br><span>CDM</span></div>
+        <div class="player-card">조엘링톤<br><span>CM</span></div>
+        <div class="player-card">윌록<br><span>CM</span></div>
+      </div>
+
+      <div class="row">
+        <div class="player-card">알미론<br><span>RW</span></div>
+        <div class="player-card">이사크<br><span>CF</span></div>
+        <div class="player-card">고든<br><span>LW</span></div>
+      </div>
+    </div>
+
+    <style>
+      .player-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .player-card {
+        width: 200px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        text-align: center;
+        background-color: #fff;
+      }
+
+      .player-card img {
+        width: 100%;
+        height: auto;
+      }
+
+      .player-card .info {
+        padding: 10px;
+      }
+
+      body {
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', sans-serif;
+        color: #222;
+      }
+
+      .player-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        padding: 30px;
+      }
+
+      .player-card {
+        width: 180px;
+        padding: 15px;
+        background-color: #241F20; /* 뉴캐슬 블랙 */
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        color: #fff;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .player-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      }
+
+      .player-card h3 {
+        font-size: 1.1em;
+        margin-bottom: 8px;
+      }
+
+      .player-card p {
+        font-size: 0.9em;
+        color: #d1f3f0;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', 'Pretendard', sans-serif;
+        background: linear-gradient(to bottom right, #241F20 30%, #cfcfcf 100%);
+        background-attachment: fixed;
+        color: #fff;
+      }
+
+      .formation {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 50px;
+        padding: 60px 20px;
+      }
+
+      .row {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+      }
+
+      .player-card {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 20px;
+        padding: 20px 30px;
+        min-width: 140px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.3rem;
+        letter-spacing: 0.5px;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .player-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+      }
+
+      .player-card span {
+        display: block;
+        margin-top: 8px;
+        font-size: 1.1rem;
+        font-weight: 400;
+        color: #e0ffe6;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+    </style>
+</body>
+</html>

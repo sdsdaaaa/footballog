@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Footballog 데스크탑 UI</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/script.js" defer></script>
+
+  <!-- Firebase 인증 스크립트 (공통) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA02saQDvqMQbDLrD5UMwX848E6eFO-rUU",
+      authDomain: "northern-cooler-461505-d5.firebaseapp.com",
+      projectId: "northern-cooler-461505-d5",
+      storageBucket: "northern-cooler-461505-d5.appspot.com",
+      messagingSenderId: "57199546606",
+      appId: "1:57199546606:web:b4e134094c86623e25a3ff",
+      measurementId: "G-562VJ9VE2P"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const loginBtn = document.querySelector(".login-btn");
+      const mypageBtn = document.getElementById("mypageBtn");
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          loginBtn.textContent = "로그아웃";
+          loginBtn.href = "#";
+          loginBtn.onclick = () => {
+            signOut(auth).then(() => {
+              alert("로그아웃되었습니다.");
+              location.reload();
+            });
+          };
+          if (mypageBtn) mypageBtn.style.display = "inline-block";
+        } else {
+          loginBtn.textContent = "로그인";
+          loginBtn.href = "login.html";
+          if (mypageBtn) mypageBtn.style.display = "none";
+        }
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <!-- 🖱 감지 센서 -->
+  <div id="taskbar-sensor" style="position: fixed; top: 0; left: 0; width: 5px; height: 100vh; z-index: 10000;"></div>
+
+  <!-- 🧭 상단바 -->
+  <header>
+    <div class="left-section">
+      <div class="logo">FOOTBALLOG</div>
+      <input class="search" placeholder="검색 :" />
+    </div>
+    <div class="right-section">
+      <a href="mypage.html" id="mypageBtn" class="mypage-btn" style="display: none;">마이페이지</a>
+      <a href="login.html" class="login-btn">로그인</a>
+      <button class="menu-btn" onclick="toggleRightMenu()">☰</button>
+    </div>
+  </header>
+
+  <!-- 📌 탭 메뉴 -->
+  <nav class="tab-menu">
+    <a href="home.html">홈</a>
+    <a href="schedule.html">일정</a>
+    <a href="ranking.html">순위</a>
+    <a href="team-info.html">팀 정보</a>
+  </nav>
+
+  <!-- ✨ 여기에 각 페이지별 콘텐츠 삽입 -->
+  <main>
+    <!-- 이 안의 콘텐츠는 각 페이지에서 다르게 구성 -->
+  </main>
+
+  <!-- ⚙ 작업 표시줄 -->
+  <footer id="taskbar">
+    <div id="taskbar-icons"></div>
+    <div class="taskbar-home">⌂</div>
+  </footer>
+
+  <!-- 📋 우측 메뉴 패널 -->
+  <div id="right-menu-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="margin: 0;">메뉴</h3>
+      <button onclick="toggleRightMenu()" style="border: none; background: none; font-size: 18px; cursor: pointer;">≫</button>
+    </div>
+    <ul>
+      <li onclick="handleMenuClick('football-news')">축구 뉴스</li>
+      <li onclick="handleMenuClick('community')">커뮤니티</li>
+      <li onclick="handleMenuClick('goods-shopping')">굿즈 쇼핑</li>
+      <li onclick="handleMenuClick('match-stats')">경기 통계</li>
+      <li onclick="handleMenuClick('match-broadcast')">경기 중계</li>
+      <li onclick="handleMenuClick('football-video')">축구 영상</li>
+      <li onclick="handleMenuClick('send-message')">쪽지</li>
+      <li onclick="handleMenuClick('add-friends')">친구추가</li>
+    </ul>
+  </div>
+
+  <!-- 🖱 우클릭 컨텍스트 메뉴 -->
+  <ul id="context-menu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; border-radius: 5px; padding: 0; margin: 0; list-style: none; z-index: 10000;">
+    <li id="ctx-close" style="padding: 8px 12px; cursor: pointer;">닫기</li>
+  </ul>
+</body>
+</html>

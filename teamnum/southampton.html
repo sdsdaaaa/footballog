@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>사우샘프턴 - 팀 상세 정보</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(to bottom right, #D00027, #FFD700);
+      color: #fff;
+    }
+    .team-header img {
+      width: 100px;
+    }
+    .player-card {
+      width: 160px;
+      padding: 15px;
+      background-color: #D00027;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      transition: 0.2s;
+    }
+    .player-card:hover {
+      transform: scale(1.05);
+      background-color: #A00020;
+    }
+    .player-card span {
+      display: block;
+      margin-top: 6px;
+      font-size: 1rem;
+      font-weight: normal;
+      color: #eee;
+    }
+    .formation {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      padding: 40px 20px;
+    }
+    .row {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="team-header">
+    <h1>사우샘프턴 FC</h1>
+    <img src="https://crests.football-data.org/340.png" alt="사우샘프턴 로고">
+    <p><strong>설립:</strong> 1885년</p>
+    <p><strong>홈구장:</strong> 세인트 메리스 스타디움</p>
+    <p><strong>감독:</strong> 러셀 마틴 (잉글랜드)</p>
+  </div>
+
+  <h2>🏆 트로피</h2>
+  <ul>
+    <li>FA컵: 1회 (1976)</li>
+    <li>EFL 챔피언십 승격 (2023–24 예정)</li>
+  </ul>
+
+  <h2>📖 팀 소개</h2>
+  <p>
+    사우샘프턴 FC는 전통 있는 클럽으로, 유소년 아카데미 출신의 스타 플레이어 배출로 유명합니다.<br>
+    최근에는 챔피언십에서 다시 프리미어리그로의 승격을 준비 중입니다.
+  </p>
+
+  <h2>👥 주요 선수</h2>
+  <div class="formation">
+    <div class="row">
+      <div class="player-card">맥카시<br><span>GK</span></div>
+    </div>
+    <div class="row">
+      <div class="player-card">매닝<br><span>RB</span></div> <!-- LB ↔ RB 교체 -->
+      <div class="player-card">베드나렉<br><span>CB</span></div>
+      <div class="player-card">하룸<br><span>CB</span></div>
+      <div class="player-card">워커-피터스<br><span>LB</span></div> <!-- RB ↔ LB 교체 -->
+    </div>
+    <div class="row">
+      <div class="player-card">워드-프라우스<br><span>CM</span></div>
+      <div class="player-card">로메오 라비아<br><span>CM</span></div>
+      <div class="player-card">스몰본<br><span>CAM</span></div>
+    </div>
+    <div class="row">
+      <div class="player-card">아담 암스트롱<br><span>RW</span></div> <!-- LW ↔ RW -->
+      <div class="player-card">아담스<br><span>CF</span></div>
+      <div class="player-card">엘유누시<br><span>LW</span></div> <!-- RW ↔ LW -->
+    </div>
+  </div>
+
+</body>
+</html>

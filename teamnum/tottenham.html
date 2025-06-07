@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>토트넘 홋스퍼 - 팀 상세 정보</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .team-header img { width: 100px; }
+    .player-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 5px;
+    }
+    .player-card {
+      display: inline-block;
+      width: 150px;
+      text-align: center;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="team-header">
+    <h1>토트넘 홋스퍼</h1>
+    <img src="https://crests.football-data.org/73.png" alt="토트넘 로고">
+    <p><strong>설립:</strong> 1882년</p>
+    <p><strong>홈구장:</strong> 토트넘 홋스퍼 스타디움</p>
+    <p><strong>감독:</strong> 안제 포스테코글루 (호주)</p>
+  </div>
+
+  <h2>🏆 트로피</h2>
+  <ul>
+    <li>잉글리시 1부 리그 우승: 2회</li>
+    <li>FA컵: 8회</li>
+    <li>EFL컵: 4회</li>
+    <li>커뮤니티 실드: 7회 (공동 우승 포함)</li>
+    <li>UEFA 컵(현 유로파리그): 2회</li>
+    <li>UEFA 컵위너스컵: 1회</li>
+  </ul>
+
+  <h2>📖 소개</h2>
+  <p>
+    토트넘 홋스퍼 FC는 런던 북부를 연고로 한 프리미어리그 구단으로, '스퍼스'라는 애칭으로 불린다.<br>
+    아스날과의 '북런던 더비'는 프리미어리그 최고의 라이벌전 중 하나이다.<br>
+    공격적인 축구를 선호하며, 손흥민을 포함한 세계적인 선수들을 배출한 바 있다.<br>
+    2018–19 시즌 UEFA 챔피언스리그 준우승을 기록한 이후, 다시 한번 정상 도전을 노리고 있다.
+  </p>
+
+  <h2>👥 주요 선수</h2>
+  <div>
+    <div class="formation">
+      <div class="row">
+        <div class="player-card">구글리엘모 비카리오<br><span>골키퍼</span></div>
+      </div>
+
+      <div class="row">
+        <div class="player-card">페드로 포로<br><span>RB</span></div>
+        <div class="player-card">로멜루<br><span>CB</span></div>
+        <div class="player-card">판 더 펜<br><span>CB</span></div>
+         <div class="player-card">우도기<br><span>LB</span></div>
+      </div>
+
+      <div class="row">
+        <div class="player-card">비수마<br><span>CDM</span></div>
+        <div class="player-card">매디슨<br><span>CAM</span></div>
+        <div class="player-card">벤탄쿠르<br><span>CM</span></div>
+      </div>
+
+      <div class="row">
+                <div class="player-card">쿨루세브스키<br><span>RW</span></div>
+        <div class="player-card">히샬리송<br><span>CF</span></div>
+               <div class="player-card">손흥민<br><span>LW</span></div>
+      </div>
+    </div>
+
+    <style>
+      .player-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .player-card {
+        width: 200px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        text-align: center;
+        background-color: #fff;
+      }
+
+      .player-card img {
+        width: 100%;
+        height: auto;
+      }
+
+      .player-card .info {
+        padding: 10px;
+      }
+
+      body {
+        background-color: #f0f4fa;
+        font-family: 'Segoe UI', sans-serif;
+        color: #222;
+      }
+
+      .player-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        padding: 30px;
+      }
+
+      .player-card {
+        width: 180px;
+        padding: 15px;
+        background-color: #132257; /* 스퍼스 네이비 */
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        color: #fff;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .player-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      }
+
+      .player-card h3 {
+        font-size: 1.1em;
+        margin-bottom: 8px;
+      }
+
+      .player-card p {
+        font-size: 0.9em;
+        color: #d1f3f0;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', 'Pretendard', sans-serif;
+        background: linear-gradient(to bottom right, #132257 30%, #c4c4c4 100%);
+        background-attachment: fixed;
+        color: #fff;
+      }
+
+      .formation {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 50px;
+        padding: 60px 20px;
+      }
+
+      .row {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+      }
+
+      .player-card {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 20px;
+        padding: 20px 30px;
+        min-width: 140px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.3rem;
+        letter-spacing: 0.5px;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .player-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+      }
+
+      .player-card span {
+        display: block;
+        margin-top: 8px;
+        font-size: 1.1rem;
+        font-weight: 400;
+        color: #e0ffe6;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+    </style>
+</body>
+</html>

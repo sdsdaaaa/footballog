@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>맨체스터 시티 - 팀 상세 정보</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .team-header img { width: 100px; }
+    .player-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 5px;
+    }
+    .player-card {
+      display: inline-block;
+      width: 150px;
+      text-align: center;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="team-header">
+    <h1>맨체스터 시티</h1>
+    <img src="https://crests.football-data.org/65.png" alt="맨시티 로고">
+    <p><strong>설립:</strong> 1880년 (웨스트 고튼 세인트 마크스)</p>
+    <p><strong>홈구장:</strong> 에티하드 스타디움</p>
+    <p><strong>감독:</strong> 펩 과르디올라 (스페인)</p>
+  </div>
+
+  <h2>🏆 트로피</h2>
+  <ul>
+    <li>프리미어리그: 9회</li>
+    <li>UEFA 챔피언스리그: 1회</li>
+    <li>FA컵: 6회</li>
+    <li>EFL컵: 8회</li>
+    <li>커뮤니티 실드: 6회</li>
+    <li>UEFA 슈퍼컵: 1회</li>
+    <li>FIFA 클럽 월드컵: 1회</li>
+  </ul>
+
+  <h2>📖 소개</h2>
+  <p>
+    맨체스터 시티 FC는 잉글랜드 프리미어리그(EPL)의 강호로,<br>
+    2008년 아부다비 유나이티드 그룹 인수 이후 막대한 투자를 통해 세계적인 팀으로 성장했다.<br>
+    펩 과르디올라 감독의 철학 하에 점유율 기반의 정교한 축구를 구사하며,<br>
+    2022-23 시즌에는 트레블(리그, FA컵, 챔피언스리그)을 달성하는 쾌거를 이뤘다.
+  </p>
+
+  <h2>👥 주요 선수</h2>
+  <div>
+    <div class="formation">
+      <div class="row">
+        <div class="player-card">에데르송<br><span>골키퍼</span></div>
+      </div>
+
+      <div class="row">
+        <div class="player-card">워커<br><span>RB</span></div>
+        <div class="player-card">디아스<br><span>CB</span></div>
+        <div class="player-card">아칸지<br><span>CB</span></div>
+        <div class="player-card">그바르디올<br><span>LB</span></div>
+       </div>
+
+      <div class="row">
+        <div class="player-card">로드리<br><span>CDM</span></div>
+        <div class="player-card">더 브라위너<br><span>CM</span></div>
+        <div class="player-card">베르나르두 실바<br><span>CM</span></div>
+      </div>
+
+      <div class="row">
+        <div class="player-card">포든<br><span>RW</span></div>
+        <div class="player-card">홀란드<br><span>CF</span></div>
+        <div class="player-card">그릴리시<br><span>LW</span></div>
+      </div>
+    </div>
+
+    <style>
+      .player-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .player-card {
+        width: 200px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        text-align: center;
+        background-color: #fff;
+      }
+
+      .player-card img {
+        width: 100%;
+        height: auto;
+      }
+
+      .player-card .info {
+        padding: 10px;
+      }
+
+      body {
+        background-color: #e3f2fd; /* 연한 하늘색 배경 */
+        font-family: 'Segoe UI', sans-serif;
+        color: #222;
+      }
+
+      .player-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        padding: 30px;
+      }
+
+      .player-card {
+        width: 180px;
+        padding: 15px;
+        background-color: #6CABDD; /* 맨시티 블루 */
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        color: #fff;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .player-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      }
+
+      .player-card h3 {
+        font-size: 1.1em;
+        margin-bottom: 8px;
+      }
+
+      .player-card p {
+        font-size: 0.9em;
+        color: #d1f3f0;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', 'Pretendard', sans-serif;
+        background: linear-gradient(to bottom right, #6CABDD 30%, #004d98 100%);
+        background-attachment: fixed;
+        color: #fff;
+      }
+
+      .formation {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 50px;
+        padding: 60px 20px;
+      }
+
+      .row {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+      }
+
+      .player-card {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 20px;
+        padding: 20px 30px;
+        min-width: 140px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.3rem;
+        letter-spacing: 0.5px;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .player-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+      }
+
+      .player-card span {
+        display: block;
+        margin-top: 8px;
+        font-size: 1.1rem;
+        font-weight: 400;
+        color: #e0ffe6;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+    </style>
+</body>
+</html>

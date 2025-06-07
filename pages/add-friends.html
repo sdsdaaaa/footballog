@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>친구 추가 - FOOTBALLOG</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f2f5;
+      padding: 20px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    h2 {
+      text-align: center;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .back-button {
+      background-color: #ccc;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 12px;
+      height: 30px;
+      cursor: pointer;
+    }
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      flex-grow: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 16px;
+      background-color: #1565c0;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0d47a1;
+    }
+    #message {
+      font-size: 14px;
+      color: #333;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .request-section {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      min-height: 100px;
+    }
+    .request-list {
+      flex: 1;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .request-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .request-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <button class="back-button" onclick="history.back()">← 뒤로가기</button>
+    <h2>🔍 친구 추가</h2>
+    <div></div>
+  </div>
+
+  <div class="input-group">
+    <input type="text" id="nickname-input" placeholder="닉네임으로 검색" />
+    <button onclick="checkAndSendRequest()">요청</button>
+  </div>
+  <div id="message"></div>
+
+  <div class="request-section">
+    <div class="request-list">
+      <h4>📤 보낸 요청</h4>
+      <div id="sent-requests"></div>
+    </div>
+    <div class="request-list">
+      <h4>📥 받은 요청</h4>
+      <div id="received-requests"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+    import {
+      getFirestore, collection, query, where,
+      getDocs, addDoc, deleteDoc, doc, updateDoc
+    } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA02saQDvqMQbDLrD5UMwX848E6eFO-rUU",
+      authDomain: "northern-cooler-461505-d5.firebaseapp.com",
+      projectId: "northern-cooler-461505-d5",
+      storageBucket: "northern-cooler-461505-d5.appspot.com",
+      messagingSenderId: "57199546606",
+      appId: "1:57199546606:web:b4e134094c86623e25a3ff"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUserNickname = null;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        alert("로그인이 필요합니다.");
+        window.location.href = "login.html";
+        return;
+      }
+      const userSnap = await getDocs(query(collection(db, "users"), where("uid", "==", user.uid)));
+      currentUserNickname = userSnap.docs[0]?.data().nickname || null;
+      loadRequests();
+    });
+
+    window.checkAndSendRequest = async function () {
+      const inputNick = document.getElementById("nickname-input").value.trim();
+      const msgEl = document.getElementById("message");
+
+      if (!inputNick || inputNick === currentUserNickname) {
+        msgEl.textContent = "올바른 닉네임을 입력하세요.";
+        return;
+      }
+
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("nickname", "==", inputNick));
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        msgEl.textContent = "존재하지 않는 회원입니다.";
+        return;
+      }
+
+      const friendsRef = collection(db, "friends");
+      const checkQuery = query(
+        friendsRef,
+        where("owner", "==", currentUserNickname),
+        where("friendNickname", "==", inputNick)
+      );
+      const checkSnap = await getDocs(checkQuery);
+
+      if (!checkSnap.empty) {
+        msgEl.textContent = "이미 친구입니다.";
+        return;
+      }
+
+      await addDoc(friendsRef, {
+        owner: currentUserNickname,
+        friendNickname: inputNick,
+        status: "pending",
+        timestamp: new Date()
+      });
+
+      msgEl.textContent = "친구 요청을 보냈습니다!";
+      loadRequests();
+    }
+
+    async function loadRequests() {
+      const friendsRef = collection(db, "friends");
+
+      const sentQuery = query(friendsRef, where("owner", "==", currentUserNickname), where("status", "==", "pending"));
+      const recvQuery = query(friendsRef, where("friendNickname", "==", currentUserNickname), where("status", "==", "pending"));
+
+      const sentSnap = await getDocs(sentQuery);
+      const recvSnap = await getDocs(recvQuery);
+
+      const sentEl = document.getElementById("sent-requests");
+      const recvEl = document.getElementById("received-requests");
+
+      sentEl.innerHTML = "";
+      recvEl.innerHTML = "";
+
+      sentSnap.forEach(docSnap => {
+        const data = docSnap.data();
+        const div = document.createElement("div");
+        div.className = "request-item";
+        div.innerHTML = `
+          <span>${data.friendNickname}</span>
+          <button onclick="cancelRequest('${docSnap.id}')">취소</button>
+        `;
+        sentEl.appendChild(div);
+      });
+
+      recvSnap.forEach(docSnap => {
+        const data = docSnap.data();
+        const div = document.createElement("div");
+        div.className = "request-item";
+        div.innerHTML = `
+          <span>${data.owner}</span>
+          <div>
+            <button onclick="acceptRequest('${docSnap.id}', '${data.owner}')">수락</button>
+            <button onclick="declineRequest('${docSnap.id}')">거절</button>
+          </div>
+        `;
+        recvEl.appendChild(div);
+      });
+    }
+
+    window.cancelRequest = async function (id) {
+      await deleteDoc(doc(db, "friends", id));
+      loadRequests();
+    }
+
+    window.declineRequest = async function (id) {
+      await deleteDoc(doc(db, "friends", id));
+      loadRequests();
+    }
+
+   window.acceptRequest = async function (id, requester) {
+  // 1. 받은 요청 문서 상태만 'accepted'로 변경 (A → B)
+  await updateDoc(doc(db, "friends", id), {
+    status: "accepted"
+  });
+
+  // 2. B → A 관계도 추가 (B의 목록에 A 추가)
+  const reverseQuery = query(
+    collection(db, "friends"),
+    where("owner", "==", currentUserNickname),
+    where("friendNickname", "==", requester)
+  );
+  const reverseSnap = await getDocs(reverseQuery);
+  if (reverseSnap.empty) {
+    await addDoc(collection(db, "friends"), {
+      owner: currentUserNickname,
+      friendNickname: requester,
+      status: "accepted",
+      timestamp: new Date()
+    });
+  }
+
+  loadRequests();
+};
+
+  </script>
+</body>
+</html>

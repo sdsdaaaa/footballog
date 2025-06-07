@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>리버풀 - 팀 상세 정보</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .team-header img { width: 100px; }
+    .player-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 5px;
+    }
+    .player-card {
+      display: inline-block;
+      width: 150px;
+      text-align: center;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="team-header">
+    <h1>리버풀</h1>
+    <img src="https://crests.football-data.org/64.png" alt="리버풀 로고">
+    <p><strong>설립:</strong> 1892년</p>
+    <p><strong>홈구장:</strong> 안필드</p>
+    <p><strong>감독:</strong> 아르넷 슬롯 (네덜란드)</p>
+  </div>
+
+  <h2>🏆 트로피</h2>
+  <ul>
+    <li>프리미어리그: 19회</li>
+    <li>UEFA 챔피언스리그: 6회</li>
+    <li>FA컵: 8회</li>
+    <li>EFL컵: 9회</li>
+    <li>커뮤니티 실드: 16회</li>
+    <li>UEFA 슈퍼컵: 4회</li>
+    <li>UEFA 유로파리그: 3회</li>
+    <li>FIFA 클럽 월드컵: 1회</li>
+  </ul>
+
+  <h2>📖 소개</h2>
+  <p>
+    리버풀 FC는 잉글랜드 머지사이드 주 리버풀을 연고지로 하는 프리미어리그 소속 축구 클럽이다.<br>
+    1892년 창단된 잉글랜드 내에서도 손에 꼽히는 전통 명문 구단이며,<br>
+    UEFA 챔피언스리그 우승 6회로 잉글랜드 클럽 중 최다 기록 보유.<br>
+    '머지사이드 더비', '노스웨스트 더비' 등 강한 라이벌전을 가지고 있다.
+  </p>
+
+  <h2>👥 주요 선수</h2>
+  <div>
+<div class="formation">
+  <div class="row">
+    <div class="player-card">알리송<br><span>골키퍼</span></div>
+  </div>
+
+  <div class="row">
+     <div class="player-card">알렉산더 아놀드<br><span>RB</span></div>
+    <div class="player-card">판 다이크<br><span>CB</span></div>
+    <div class="player-card">마팁<br><span>CB</span></div>
+   <div class="player-card">로버트슨<br><span>LB</span></div>
+  </div>
+
+  <div class="row">
+    <div class="player-card">맥 알리스터<br><span>CM</span></div>
+    <div class="player-card">소보슬라이<br><span>CM</span></div>
+    <div class="player-card">커티스 존스<br><span>CM</span></div>
+  </div>
+
+  <div class="row">
+    <div class="player-card">모하메드 살라<br><span>RW</span></div>
+    <div class="player-card">다윈 누녜스<br><span>CF</span></div>
+   <div class="player-card">루이스 디아스<br><span>LW</span></div>
+  </div>
+</div>
+
+  <style>
+    .player-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+
+.player-card {
+  width: 200px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+  background-color: #fff;
+}
+
+.player-card img {
+  width: 100%;
+  height: auto;
+}
+
+.player-card .info {
+  padding: 10px;
+}
+
+
+body {
+  background-color: #fbecec; /* 연한 붉은 배경 */
+  font-family: 'Segoe UI', sans-serif;
+  color: #222;
+}
+
+.player-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 30px;
+}
+
+.player-card {
+  width: 180px;
+  padding: 15px;
+  background-color: #c8102e; /* 리버풀 레드 */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  color: #fff; /* 흰색 텍스트 */
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.player-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.player-card h3 {
+  font-size: 1.1em;
+  margin-bottom: 8px;
+}
+
+.player-card p {
+  font-size: 0.9em;
+  color: #d1f3f0; /* 연한 초록 강조 */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', 'Pretendard', sans-serif;
+  background: linear-gradient(to bottom right, #c8102e 30%, #007f5f 100%);
+  background-attachment: fixed;
+  color: #fff;
+}
+
+.formation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 50px;
+  padding: 60px 20px;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.player-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 20px 30px;
+  min-width: 140px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.player-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+}
+
+.player-card span {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #e0ffe6;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+
+  </style>
+</body>
+</html>

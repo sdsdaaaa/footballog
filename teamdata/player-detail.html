@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>선수 상세 정보</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      padding: 40px;
+      text-align: center;
+    }
+    img {
+      width: 120px;
+      border-radius: 50%;
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="player-name">선수 이름</h1>
+  <img id="player-photo" src="" alt="선수 사진">
+  <p><strong>국적:</strong> <span id="nationality"></span></p>
+  <p><strong>생년월일:</strong> <span id="birth"></span></p>
+  <p><strong>키 / 몸무게:</strong> <span id="height-weight"></span></p>
+  <p><strong>포지션:</strong> <span id="position"></span></p>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const playerId = params.get("player");
+    const headers = {
+      "x-rapidapi-key": "16bcdec18emsh8432e33e909b725p159395jsned7a8c858898",
+      "x-rapidapi-host": "api-football-v1.p.rapidapi.com"
+    };
+    fetch(`https://api-football-v1.p.rapidapi.com/v3/players?id=${playerId}&season=2020`, {
+      method: 'GET',
+      headers: headers
+    })
+    .then(res => res.json())
+    .then(data => {
+      const player = data.response[0].player;
+      const stat = data.response[0].statistics[0];
+      document.getElementById("player-name").textContent = player.name;
+      document.getElementById("player-photo").src = player.photo;
+      document.getElementById("nationality").textContent = player.nationality;
+      document.getElementById("birth").textContent = player.birth.date;
+      document.getElementById("height-weight").textContent = player.height + " / " + player.weight;
+      document.getElementById("position").textContent = stat.games.position;
+    })
+    .catch(err => {
+      document.body.innerHTML = "<h2>선수 정보를 불러오지 못했습니다.</h2>";
+    });
+  </script>
+</body>
+</html>

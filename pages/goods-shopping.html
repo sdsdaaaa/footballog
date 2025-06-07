@@ -1,0 +1,210 @@
+<!DOCTYPE html> 
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>굿즈 쇼핑</title>
+  <style>
+
+    
+    body {
+      background: #f7f7f7;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .news-site-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+      padding: 30px;
+    }
+    .news-card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .news-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      text-align: center;
+      padding: 20px;
+      transition: transform 0.2s ease;
+    }
+    .news-card-link:hover .news-card {
+      transform: translateY(-6px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .news-card img {
+      width: 100px;
+      height: 40px;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      margin: 0 auto 10px;
+    }
+    .news-card h3 {
+      font-size: 18px;
+      margin: 10px 0 5px;
+    }
+    .news-card p {
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1 style="text-align: center; padding: 30px 20px 10px;">🛍️ 축구 굿즈 쇼핑몰 모음</h1>
+    <div class="news-site-grid">
+
+<!-- 교체: 프리미어리그 전체 스토어 → Fanatics 유럽 축구 -->
+<a href="https://www.fanatics.com/international/soccer/o-32845121+t-92497441+z-93789-2592787316" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://www.fairlabor.org/wp-content/uploads/2022/01/FanaticsSecondarylogo.png" alt="Fanatics">
+    <h3>Fanatics Soccer</h3>
+    <p>유럽 축구팀 굿즈 통합 쇼핑</p>
+  </div>
+</a>
+
+<!-- 맨유 -->
+<a href="https://store.manutd.com/" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://i.namu.wiki/i/Rm1VM51G-DsydjTRb5dsGKz0c-h2DuZke1lB94Fia7B79R21aSmoXIWmhQtv7ziQwDcfUOF8xxu-qMMpyXs97Q.webp" alt="맨유">
+    <h3>맨체스터 유나이티드</h3>
+    <p>레전드의 팀, 프리미엄 굿즈</p>
+  </div>
+</a>
+
+<!-- PSG -->
+<a href="https://store.psg.fr/" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://sitem.ssgcdn.com/25/41/19/item/1000428194125_i1_750.jpg" alt="PSG">
+    <h3>파리 생제르맹</h3>
+    <p>이강인 소속팀 공식 샵</p>
+  </div>
+</a>
+
+<!-- 토트넘 -->
+<a href="https://shop.tottenhamhotspur.com/" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://before-images-item.croketglobal.net/item/thumbnail/151c8d21196785912f2f07d4ba1fbc10.webp" alt="토트넘">
+    <h3>토트넘 핫스퍼</h3>
+    <p>손흥민 소속팀 공식 상품</p>
+  </div>
+</a>
+
+<!-- 아스널 -->
+<a href="https://arsenaldirect.arsenal.com/" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://i.namu.wiki/i/buNtKRKr2X287T7WMyoV936r3Vc8JksriGmbj7kIkliBfQ5N_otGCaI1zzHUcrkvvnO69kCBDBokWB6JdCm-DA.webp" alt="아스널">
+    <h3>아스널 FC</h3>
+    <p>건건충을 위한 정품몰</p>
+  </div>
+</a>
+
+<!-- 삭제된 5번: 8Seconds → 교체하지 않음 -->
+
+<!-- 바르셀로나 -->
+<a href="https://store.fcbarcelona.com/" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://i.namu.wiki/i/UbyJV4NUm1slnOVvsT9CeDNBtFKZJrJvR_rsFUKq6R-VHEpqsPv6HEM-eZQdUiG-sGTBlI825PjjzbkOEjRGng.webp" alt="바르셀로나">
+    <h3>FC 바르셀로나</h3>
+    <p>스페인 명문팀 공식 샵</p>
+  </div>
+</a>
+
+<!-- 레알 마드리드 -->
+<a href="https://shop.realmadrid.com/" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://sitem.ssgcdn.com/35/64/48/item/1000552486435_i1_750.jpg" alt="레알마드리드">
+    <h3>레알 마드리드</h3>
+    <p>갤럭티코 굿즈 전문</p>
+  </div>
+</a>
+
+<!-- 바이에른 뮌헨 -->
+<a href="https://www.bayernmunichstore.com/" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://i.namu.wiki/i/y8PRevEDdgR7joPO_NyRxVcR52KAdiEbKLnpz6HSN0nCPOp8KVU1iP7oxFDxw7xeiJtQSgM33gws6NvLXY5p5Q.webp" alt="바이에른뮌헨">
+    <h3>바이에른 뮌헨</h3>
+    <p>분데스리가 최강팀 굿즈</p>
+  </div>
+</a>
+
+<!-- 인터 밀란 -->
+<a href="https://store.inter.it/" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://i.namu.wiki/i/oN2Q-v-kK4twDV7KuG2LaQW-J-f_iWN9NeF0jbIbM0k6OfoCRGgLohkBbcqjpmmLRfv39SW5X3vffzLuDOmkNA.webp" alt="인터 밀란">
+    <h3>인터 밀란</h3>
+    <p>세리에A 강호 공식 스토어</p>
+  </div>
+</a>
+
+<!-- AC 밀란 -->
+<a href="https://store.acmilan.com/" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://i.namu.wiki/i/I1i7nE8GTSBwQxXLVAthGP708avEht7VUYEoFv7bZPDbxSB4IbkZ--3WuPg-WOPRdxvOreqkDWK2QOYRCg8Q0A.webp" alt="AC 밀란">
+    <h3>AC 밀란</h3>
+    <p>세리에A 전통의 강호</p>
+  </div>
+</a>
+
+<!-- 유벤투스 -->
+<a href="https://store.juventus.com/" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://i.namu.wiki/i/nA8idoHZXNUoRQvFwyfrZH3X_HO0XR__mhkvk8djYccfxv2RLf5yYj6qfGne7TU4KHolyTqLnsmi9EbKQGD38w.webp" alt="Juventus">
+    <h3>유벤투스 FC</h3>
+    <p>이탈리아 명문 팀 굿즈</p>
+  </div>
+</a>
+
+<!-- 나이키 축구 -->
+<a href="https://www.nike.com/kr/ko_kr/c/football" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://i.namu.wiki/i/WTvxQ9JAesXkhVVwG764LxWiorbPL9A5PTL7DdG9VcgppE1hWBqRp3Fa8ncgKdCUMI9MBRH510J7QZNqfzIWKA.svg" alt="Nike 축구">
+    <h3>Nike Football</h3>
+    <p>선수 착용 유니폼 공식 채널</p>
+  </div>
+</a>
+
+<!-- 아디다스 -->
+<a href="https://www.adidas.co.kr/football" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg" alt="Adidas 축구">
+    <h3>Adidas Football</h3>
+    <p>축구화와 유니폼 모두 가능</p>
+  </div>
+</a>
+
+<!-- 푸마 -->
+<a href="https://kr.puma.com/football.html" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://blog.kakaocdn.net/dn/eISEXD/btqzQs3KhXH/9tWfV2gYjcVy2wdA8UmME1/img.jpg" alt="Puma">
+    <h3>Puma Football</h3>
+    <p>유럽 여러 클럽 공식 스폰서</p>
+  </div>
+</a>
+
+<!-- Fanatics 통합됨 → 중복 제거 -->
+
+<!-- 대한축구협회 -->
+<a href="https://shop.playkfa.com/product/sub/uniform" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://upload.wikimedia.org/wikipedia/ko/thumb/7/79/%EB%8C%80%ED%95%9C%EC%B6%95%EA%B5%AC%ED%98%91%ED%9A%8C_%EB%A1%9C%EA%B3%A0.svg/218px-%EB%8C%80%ED%95%9C%EC%B6%95%EA%B5%AC%ED%98%91%ED%9A%8C_%EB%A1%9C%EA%B3%A0.svg.png?20230810094933" alt="대한축구협회">
+    <h3>KFA 공식 스토어</h3>
+    <p>국가대표 유니폼 및 용품</p>
+  </div>
+</a>
+
+<!-- K리그 -->
+<a href="http://smartstore.naver.com/kleaguestore" target="_blank" class="news-card-link">
+  <div class="news-card">
+    <img src="https://www.kleague.com/assets/images/mobile/logo/emblem.png" alt="K리그">
+    <h3>K리그 스마트스토어</h3>
+    <p>국내 프로팀 굿즈 한눈에</p>
+  </div>
+</a>
+
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>경기 통계 - FOOTBALLOG</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    select, .nav-btn {
+      padding: 8px;
+      font-size: 14px;
+    }
+    .date-display {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .match-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+    .match-item {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .match-item:hover {
+      background-color: #eaf2ff;
+    }
+    .stat-table {
+      margin: 0 auto;
+      max-width: 700px;
+      border-collapse: collapse;
+      width: 100%;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .stat-table th, .stat-table td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    .stat-table th {
+      background: #dce6f7;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 경기 통계</h1>
+
+  <div class="top-bar">
+    <select id="league-select" onchange="fetchMatches()">
+      <option value="">리그 선택 중...</option>
+    </select>
+    <button class="nav-btn" onclick="changeDate(-1)">◀ 이전</button>
+    <span class="date-display" id="date-label"></span>
+    <button class="nav-btn" onclick="changeDate(1)">다음 ▶</button>
+  </div>
+
+  <div class="match-list" id="match-list"></div>
+
+<script>
+  const apiKey = "dba62925619cc528de8b6acc72548d85";
+  const allowedLeagueIds = [39, 140, 135]; // EPL, 라리가, 세리에A
+  const statDateRange = Array.from({ length: 15 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() + i - 7);
+    return d.toISOString().split('T')[0];
+  });
+  let currentDateIndex = 7;
+
+  function updateDateLabel() {
+    document.getElementById("date-label").textContent = statDateRange[currentDateIndex];
+  }
+
+  function changeDate(offset) {
+    currentDateIndex = Math.min(Math.max(currentDateIndex + offset, 0), statDateRange.length - 1);
+    updateDateLabel();
+    fetchMatches();
+  }
+
+  function loadLeagues() {
+    const select = document.getElementById("league-select");
+    select.innerHTML = `
+      <option value="">리그를 선택하세요</option>
+      <option value="39">프리미어리그 (영국)</option>
+      <option value="140">라리가 (스페인)</option>
+      <option value="135">세리에 A (이탈리아)</option>
+    `;
+    select.value = "39"; // 기본값 프리미어리그
+    fetchMatches();      // 최초 호출
+  }
+
+  function fetchMatches() {
+    const leagueId = document.getElementById("league-select").value;
+    if (!leagueId) return;
+    const date = statDateRange[currentDateIndex]; // ✅ 동적 날짜 적용
+    const season = 2023;
+
+    fetch(`https://v3.football.api-sports.io/fixtures?league=${leagueId}&season=${season}&date=${date}`, {
+      headers: { "x-apisports-key": apiKey }
+    })
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("match-list");
+      container.innerHTML = "";
+      if (data.results === 0) return container.innerHTML = "<p>경기 정보가 없습니다.</p>";
+
+      data.response.forEach(fix => {
+        const div = document.createElement("div");
+        div.className = "match-item";
+        div.innerHTML = `
+          <div>${fix.teams.home.name} ${fix.goals.home ?? "-"} : ${fix.goals.away ?? "-"} ${fix.teams.away.name}</div>
+          <button onclick="location.href='detail.html?fixtureId=${fix.fixture.id}'">상세 보기</button>
+        `;
+        container.appendChild(div);
+      });
+    });
+  }
+
+  updateDateLabel();
+  loadLeagues();
+</script>
+
+</body>
+</html>
